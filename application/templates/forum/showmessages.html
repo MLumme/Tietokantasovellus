@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+    <table>
+        <tr>
+            <th>Messages</th>
+        </tr>
+        
+        {% for message in messages %}
+        <tr>
+            <td>{{message.content}}</td>
+        </tr>
+        {% endfor %}   
+    </table>
+
+    <form method = "POST" action = "{{url_for('thread_add', thread_id = thread_id)}}">
+        <input type="text" name="contents"/>
+        <input type="submit" value="Add a new message"/>
+    </form>        
+{% endblock %}        
