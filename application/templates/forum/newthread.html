@@ -1,9 +1,19 @@
 {% extends "layout.html" %} 
 
 {% block body %}
+<form method = "GET" action = "{{url_for('thread_index')}}">
+        <input type="submit" value="Back to threads"/>
+</form>
+
 <form method="POST" action="{{url_for('thread_create')}}">
-    <input type="text" name="title"/>
-    <input type="text" name="contents"/>
+    Title: <input type="text" name="title" maxlength="200"/>
+    <br>
+    <textarea name="contents" rows="10" cols="100" maxlength="1000"></textarea>
+    <br>
     <input type="submit" value="Add a new thread"/>
-</form>    
+</form>
+
+<form method = "GET" action = "{{url_for('thread_index')}}">
+        <input type="submit" value="Back to threads"/>
+</form> 
 {% endblock %}

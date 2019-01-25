@@ -11,4 +11,8 @@
         </tr>
         {% endfor %}   
     </table>
+
+    <form action = "{{url_for('thread_new')}}">
+        <input type="submit" value="Add a new thread"/>
+    </form> 
 {% endblock %}        

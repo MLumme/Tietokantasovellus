@@ -1,0 +1,15 @@
+{% extends "layout.html" %} 
+
+{% block body %}
+<form method="POST" action="{{url_for('msg_edit_commit',message_id = message.id)}}">
+    <textarea name="contents" rows="10" cols="100" maxlength="1000">
+        {{message.content}}
+    </textarea>
+    <br>
+    <input type="submit" value="Finish edit"/>
+</form>
+
+<form method = "GET" action = "{{url_for('thread_view', thread_id = message.thread_id)}}">
+        <input type="submit" value="Cancel"/>
+</form> 
+{% endblock %}

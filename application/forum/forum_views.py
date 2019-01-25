@@ -11,7 +11,7 @@ def thread_index():
 #view thread with given thread_id
 @app.route("/forum/<thread_id>/", methods=["GET"])
 def thread_view(thread_id):
-    messages = Message.query.filter(Message.thread_id == thread_id).all()
+    messages = Message.query.filter(Message.thread_id == thread_id).order_by(Message.date_posted).all()
 
     return render_template("forum/showmessages.html", messages = messages, thread_id = thread_id)
 
@@ -32,7 +32,7 @@ def thread_create():
 
 #form for adding new threads
 @app.route("/forum/newthread/")
-def thread_form():
+def thread_new():
     return render_template("forum/newthread.html")    
 
 #form for adding new responses to thread
@@ -44,3 +44,35 @@ def thread_add(thread_id):
     db.session.commit()
 
     return redirect(url_for("thread_view", thread_id = thread_id))    
+
+#remove message
+@app.route("/forum/msgremove/<message_id>", methods = ["POST"])
+def msg_remove(message_id):
+    message = Message.query.filter_by(id=message_id).one()
+    thread_id = message.thread_id
+
+    db.session.delete(message)
+    db.session.commit()
+
+    return redirect(url_for("thread_view", thread_id = thread_id))
+
+#edit message
+@app.route("/forum/msgedit/<message_id>", methods = ["GET"])
+def msg_edit(message_id):
+    message = Message.query.filter_by(id=message_id).one()
+
+    return render_template("forum/editmessage.html", message = message)
+
+#commit message edit
+@app.route("/forum/msgeditcommit/<message_id>", methods = ["POST"])
+def msg_edit_commit(message_id):
+    message = Message.query.filter_by(id=message_id).one()
+
+    message.content = request.form.get("contents")
+    message.date_edited = db.func.current_timestamp()
+
+    thread_id = message.thread_id
+
+    db.session.commit()
+
+    return redirect(url_for("thread_view", thread_id = thread_id))
