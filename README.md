@@ -8,7 +8,7 @@ Repo for database project for course TKT20011, project subject web forum. Eventu
 [Current design for forum databases relational model](documentation/forum_relational_model.md)
 
 ToDo: 
-..* Registration/login functionality, tying threads and messages to their creators, limiting availabilty of editing and removal to creators.
-..* Implementation of admin and normal users. 
-..* Implementation of search function.
-..* Selection of topics when creating thread.
+  * Registration/login functionality, tying threads and messages to their creators, limiting availabilty of editing and removal to creators.
+  * Implementation of admin and normal users. 
+  * Implementation of search function.
+  * Selection of topics when creating thread.
