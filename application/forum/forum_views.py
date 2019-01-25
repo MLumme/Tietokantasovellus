@@ -3,7 +3,7 @@ from flask import request, render_template, url_for, redirect
 from application.forum.forum_models import Thread,Message
 
 #show list of threads, eventually forum index
-@app.route("/forum", methods = ["GET"])
+@app.route("/forum/", methods = ["GET"])
 def thread_index():
     threads = Thread.query.all()
     return render_template("forum/showthreads.html", threads = threads)
