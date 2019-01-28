@@ -1,0 +1,51 @@
+{% extends "layout.html" %} 
+
+{% block body %}
+<form method = "GET" action = "{{url_for('thread_index')}}">
+    <input type="submit" value="Back to threads"/>
+</form>
+
+{%for field in err%}
+    {%for error in err[field]%}
+        <li>{{error}}</li>
+    {%endfor%}
+{%endfor%}
+
+<form method="POST" action="{{url_for('auth_reg')}}">    
+    <table>
+        <tr>
+            <td>
+                {{reg_form.username.label}}                
+            </td>
+            <td>
+                {{reg_form.username}}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{reg_form.password.label}}                
+            </td>            
+            <td>
+                {{reg_form.password}}
+            </td>
+        </tr> 
+        <tr>
+            <td>
+                {{reg_form.password_repeat.label}}                
+            </td>            
+            <td>
+                {{reg_form.password_repeat}}
+            </td>
+        </tr>           
+        <tr>
+            <td>
+                <input type="submit" value="Register"/>
+            </td>
+        </tr>
+     </table>
+</form> 
+
+<form method = "GET" action = "{{url_for('thread_index')}}">
+    <input type="submit" value="Back to threads"/>
+</form> 
+{% endblock %}

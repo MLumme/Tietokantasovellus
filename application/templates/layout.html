@@ -7,6 +7,17 @@
     </head>
 
     <body>
+        {% if current_user.is_authenticated %}
+        <p>
+            {{current_user.username}}
+            <a href="{{url_for('auth_logout')}}">Logout</a>
+        </p>
+        {% else %}
+        <a href="{{url_for('auth_login')}}">Login</a>
+        /
+        <a href="{{url_for('auth_reg')}}">Register</a> 
+        {% endif %}
+
         {%block body%}
         <p>Loading contents from index for now</p>
         {%endblock%}

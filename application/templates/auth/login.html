@@ -1,31 +1,39 @@
 {% extends "layout.html" %} 
 
 {% block body %}
+
+
 <form method = "GET" action = "{{url_for('thread_index')}}">
     <input type="submit" value="Back to threads"/>
 </form>
 
-<form method="POST" action="{{url_for('thread_new')}}">
+<li>{{err}}</li>
+
+<form method="POST" action="{{url_for('auth_login')}}">
     <table>
         <tr>
             <td>
-                {{new_thread_form.thread_title.title}}
-                {{err}}
+                {{login_form.username.label}}                
+            </td>
+            <td>
+                {{login_form.username}}
             </td>
         </tr>
         <tr>
             <td>
-                {{new_thread_form.message_content.message(rows='10',cols='100')}}
-                {{err}}
+                {{login_form.password.label}}                
+            </td>            
+            <td>
+                {{login_form.password}}
             </td>
-        </tr>
+        </tr>        
         <tr>
             <td>
-                <input type="submit" value="Post"/>
+                <input type="submit" value="Login"/>
             </td>
         </tr>
-     </table> 
-</form>
+     </table>
+</form> 
 
 <form method = "GET" action = "{{url_for('thread_index')}}">
     <input type="submit" value="Back to threads"/>

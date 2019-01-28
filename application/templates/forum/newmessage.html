@@ -1,11 +1,11 @@
 {% extends "layout.html" %} 
 
 {% block body %}
-<form method="POST" action="{{url_for('msg_edit_commit',message_id = message.id)}}">
+<form method="POST" action="{{url_for('thread_add', thread_id = thread_id)}}">
     <table>
         <tr>
             <td>
-                {{messageForm.message(rows='10', cols='100')}}
+                {{message_form.message(rows='10', cols='100')}}
                 {{err}}
             </td>
         </tr>
@@ -17,7 +17,7 @@
      </table>
 </form>
 
-<form method = "GET" action = "{{url_for('thread_view', thread_id = message.thread_id)}}">
+<form method = "GET" action = "{{url_for('thread_view', thread_id = thread_id)}}">
     <input type="submit" value="Cancel"/>
 </form> 
 {% endblock %}

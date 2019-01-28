@@ -12,28 +12,27 @@
     {% for message in messages %}
     <tr>
         <td>
-            {{message.date_posted.strftime('%H:%M:%S \n %d/%m/%Y')}}
-            {{message.date_edited.strftime('%H:%M:%S \n %d/%m/%Y')}}
-            <form method="POST" action="{{url_for('msg_remove', message_id = message.id)}}">
-                <input type="submit" value="Remove"/>
-            </form> 
-            <form method="GET" action="{{url_for('msg_edit', message_id = message.id)}}">
-                <input type="submit" value="Edit"/>
-            </form>
+            Posted: {{message.date_posted.strftime('%H:%M:%S \n %d/%m/%Y')}}
             <br>
-            <p>{{message.content}}</p> 
-            <br>   
+            {% if(message.date_posted != message.date_edited) %}
+                Edited: {{message.date_edited.strftime('%H:%M:%S \n %d/%m/%Y')}}
+                <br>
+             {% endif %}   
+            <form method="POST">
+                <input type="submit" value="Remove" formaction="{{url_for('msg_remove', message_id = message.id)}}"/>
+                <input type="submit" value="Edit" formaction="{{url_for('msg_edit', message_id = message.id)}}"/>
+            </form>  
+        </td>
+        <td>
+            {{message.content}}
         </td>
     </tr>
     {% endfor %}   
 </table>
+<form method = "GET" action = "{{url_for('thread_add', thread_id = thread_id)}}">
+    <input type="submit" value="New post"/>
+</form> 
 
-<form method ="POST" action="{{url_for('thread_add', thread_id = thread_id)}}">
-    <textarea name="contents" rows="10" cols="100" maxlength="1000"></textarea>
-    <br>
-    <input type="submit" value="Add a new message"/>
-</form>
-    
 <form method = "GET" action = "{{url_for('thread_index')}}">
     <input type="submit" value="Back to threads"/>
 </form> 

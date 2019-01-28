@@ -1,6 +1,8 @@
 from application import app, db
-from flask import request, render_template, url_for, redirect
 from application.forum.forum_models import Thread,Message
+from application.forum.forum_forms import ThreadForm,MessageForm,NewThreadForm
+from flask import request, render_template, url_for, redirect
+from flask_login import login_required
 
 #show list of threads, eventually forum index
 @app.route("/forum/", methods = ["GET"])
@@ -8,37 +10,58 @@ def thread_index():
     threads = Thread.query.all()
     return render_template("forum/showthreads.html", threads = threads)
 
-#view thread with given thread_id
-@app.route("/forum/<thread_id>/", methods=["GET"])
-def thread_view(thread_id):
-    messages = Message.query.filter(Message.thread_id == thread_id).order_by(Message.date_posted).all()
+#form for adding new threads and sending thrm to database
+@app.route("/forum/newthread/", methods = ["GET","POST"])
+@login_required
+def thread_new():
+    #if get send to thread creation form
+    if(request.method == "GET"):
+        new_thread_form = NewThreadForm()
 
-    return render_template("forum/showmessages.html", messages = messages, thread_id = thread_id)
+        return render_template("forum/newthread.html", new_thread_form = new_thread_form)    
 
-#add a new thread and first message to db
-@app.route("/forum/", methods=["POST"])
-def thread_create():
-    thread = Thread(request.form.get("title"))
+    #else extract form, add new entries for thread and message tables
+    new_thread_form = NewThreadForm(request.form)
+
+    thread = Thread(new_thread_form.thread_title.title.data)
 
     db.session().add(thread)
     db.session().flush()
 
-    message = Message(request.form.get("contents"),thread.id)
+    message = Message(new_thread_form.message_content.message.data,thread.id)
 
     db.session().add(message)
     db.session().commit()
 
     return redirect(url_for("thread_index"))
 
-#form for adding new threads
-@app.route("/forum/newthread/")
-def thread_new():
-    return render_template("forum/newthread.html")    
+#view thread with given thread_id
+@app.route("/forum/<thread_id>/", methods=["GET"])
+@login_required
+def thread_view(thread_id):
+    messages = Message.query.filter(Message.thread_id == thread_id).order_by(Message.date_posted).all()
+    
+    message_form = MessageForm()
 
-#form for adding new responses to thread
-@app.route("/forum/<thread_id>/new", methods = ["POST"])
+    return render_template("forum/showmessages.html", messages = messages, thread_id = thread_id, message_form = message_form)
+
+#add new responses to thread
+@app.route("/forum/<thread_id>/new", methods = ["GET","POST"])
+@login_required
 def thread_add(thread_id):
-    message = Message(request.form.get("contents"), thread_id)
+
+    if(request.method == "GET"):
+        message_form = MessageForm()
+
+        return render_template("forum/newmessage.html", message_form = message_form, thread_id = thread_id)
+
+
+    message_form = MessageForm(request.form)
+
+    if(not message_form.validate()):
+        return render_template()
+
+    message = Message(message_form.message.data, thread_id)
 
     db.session.add(message)
     db.session.commit()
@@ -47,6 +70,7 @@ def thread_add(thread_id):
 
 #remove message
 @app.route("/forum/msgremove/<message_id>", methods = ["POST"])
+@login_required
 def msg_remove(message_id):
     message = Message.query.filter_by(id=message_id).one()
     thread_id = message.thread_id
@@ -57,19 +81,25 @@ def msg_remove(message_id):
     return redirect(url_for("thread_view", thread_id = thread_id))
 
 #edit message
-@app.route("/forum/msgedit/<message_id>", methods = ["GET"])
+@app.route("/forum/msgedit/<message_id>", methods = ["POST"])
+@login_required
 def msg_edit(message_id):
     message = Message.query.filter_by(id=message_id).one()
 
-    return render_template("forum/editmessage.html", message = message)
+    message_form = MessageForm()
+    message_form.message.data = message.content
+    
+    return render_template("forum/editmessage.html", message = message, message_form = message_form)
 
 #commit message edit
 @app.route("/forum/msgeditcommit/<message_id>", methods = ["POST"])
+@login_required
 def msg_edit_commit(message_id):
     message = Message.query.filter_by(id=message_id).one()
 
-    message.content = request.form.get("contents")
-    message.date_edited = db.func.current_timestamp()
+    messageForm = MessageForm(request.form)
+
+    message.content = messageForm.message.data
 
     thread_id = message.thread_id
 
