@@ -1,8 +1,8 @@
 from application import app, db
-from application.forum.forum_models import Thread,Message
-from application.forum.forum_forms import ThreadForm,MessageForm,NewThreadForm
+from application.forum.forum_models import Thread, Message
+from application.forum.forum_forms import ThreadForm, MessageForm, NewThreadForm
 from flask import request, render_template, url_for, redirect
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 #show list of threads, eventually forum index
 @app.route("/forum/", methods = ["GET"])
@@ -23,12 +23,12 @@ def thread_new():
     #else extract form, add new entries for thread and message tables
     new_thread_form = NewThreadForm(request.form)
 
-    thread = Thread(new_thread_form.thread_title.title.data)
+    thread = Thread(new_thread_form.thread_title.title.data,current_user.get_id())
 
     db.session().add(thread)
     db.session().flush()
 
-    message = Message(new_thread_form.message_content.message.data,thread.id)
+    message = Message(new_thread_form.message_content.message.data,thread.id,current_user.get_id())
 
     db.session().add(message)
     db.session().commit()
@@ -61,7 +61,7 @@ def thread_add(thread_id):
     if(not message_form.validate()):
         return render_template()
 
-    message = Message(message_form.message.data, thread_id)
+    message = Message(message_form.message.data, thread_id, current_user.get_id())
 
     db.session.add(message)
     db.session.commit()

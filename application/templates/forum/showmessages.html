@@ -17,11 +17,14 @@
             {% if(message.date_posted != message.date_edited) %}
                 Edited: {{message.date_edited.strftime('%H:%M:%S \n %d/%m/%Y')}}
                 <br>
-             {% endif %}   
+             {% endif %} 
+             
+             {% if(message.user_id == current_user.get_id()) %}
             <form method="POST">
                 <input type="submit" value="Remove" formaction="{{url_for('msg_remove', message_id = message.id)}}"/>
                 <input type="submit" value="Edit" formaction="{{url_for('msg_edit', message_id = message.id)}}"/>
             </form>  
+            {% endif %}
         </td>
         <td>
             {{message.content}}

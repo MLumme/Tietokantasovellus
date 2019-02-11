@@ -54,7 +54,7 @@ def auth_reg():
         return render_template("auth/register.html", reg_form = reg_form, err = err)
 
     #create user and commit to db
-    user = User(reg_form.username, reg_form.password)
+    user = User(reg_form.username.data, reg_form.password.data)
 
     db.session.add(user)
     db.session.commit()
