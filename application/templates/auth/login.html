@@ -2,11 +2,6 @@
 
 {% block body %}
 
-
-<form method = "GET" action = "{{url_for('thread_index')}}">
-    <input type="submit" value="Back to threads"/>
-</form>
-
 <li>{{err}}</li>
 
 <form method="POST" action="{{url_for('auth_login')}}">

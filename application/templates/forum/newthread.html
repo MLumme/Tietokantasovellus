@@ -1,9 +1,6 @@
 {% extends "layout.html" %} 
 
 {% block body %}
-<form method = "GET" action = "{{url_for('thread_index')}}">
-    <input type="submit" value="Back to threads"/>
-</form>
 
 <form method="POST" action="{{url_for('thread_new')}}">
     <table>
