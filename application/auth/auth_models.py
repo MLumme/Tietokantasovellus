@@ -8,6 +8,7 @@ class User(db.Model):
     date_edited = db.Column(db.DateTime, default = db.func.current_timestamp(), onupdate = db.func.current_timestamp())
     username = db.Column(db.String(200), nullable = False)
     password = db.Column(db.String(200), nullable = False)
+    admin = db.Column(db.Boolean, default = False)
     threads = db.relationship("Thread")
     messages = db.relationship("Message")
 
@@ -26,3 +27,6 @@ class User(db.Model):
 
     def is_authenticated(self):
         return True
+
+    def is_admin(self):
+        return self.admin

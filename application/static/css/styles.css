@@ -1,0 +1,10 @@
+body {
+    align-items: center;
+    background-color: whitesmoke
+}
+
+.form{
+    max-width: 350px;
+    padding: 15px;
+    margin: auto;
+}

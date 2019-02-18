@@ -1,34 +1,41 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<table>
-    <tr>
-        <th>Messages</th>
-    </tr>
-        
-    {% for message in messages %}
-    <tr>
-        <td>
-            Posted: {{message.date_posted.strftime('%H:%M:%S \n %d/%m/%Y')}}
-            <br>
-            {% if(message.date_posted != message.date_edited) %}
-                Edited: {{message.date_edited.strftime('%H:%M:%S \n %d/%m/%Y')}}
-                <br>
-             {% endif %} 
-             
-             {% if(message.user_id == current_user.get_id()) %}
-            <form method="POST">
-                <input type="submit" value="Remove" formaction="{{url_for('msg_remove', message_id = message.id)}}"/>
-                <input type="submit" value="Edit" formaction="{{url_for('msg_edit', message_id = message.id)}}"/>
-            </form>  
-            {% endif %}
-        </td>
-        <td>
-            {{message.content}}
-        </td>
-    </tr>
-    {% endfor %}   
-</table>
+<div class="container">
+    
+</div>
+
+<div class="container">
+    <table class="table table-striped">
+        <thead class="bg-dark text-light">
+            <tr>
+                <th colspan=3 scope="col">
+                    <h4>{{thread_contents[0].title}}</h4>
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for message in thread_contents %}
+            <tr>
+                <td class=col-2>
+                    <h4>{{message.username}}</h4> <br>
+                    {{message.Message.date_posted.strftime('%d/%m/%Y %H:%M:%S')}} <br>
+                    {{message.Message.date_edited.strftime('%d/%m/%Y %H:%M:%S')}} <br>
+                    <form method="POST" class="">
+                        <button class="btn btn-sm btn-primary" type="submit" formaction="">Edit</button>
+                        <button class="btn btn-sm btn-primary" type="submit" formaction="">Remove</button>
+                    </form>
+                </td>
+                <td>
+                    <p>{{message.Message.content}}</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>   
+    </table>
+</div>
+
 <form method = "GET" action = "{{url_for('thread_add', thread_id = thread_id)}}">
     <input type="submit" value="New post"/>
 </form> 

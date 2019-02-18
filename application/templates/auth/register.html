@@ -2,47 +2,30 @@
 
 {% block body %}
 
-{%for field in err%}
-    {%for error in err[field]%}
-        <li>{{error}}</li>
+{%if(err)%}
+    <div class="alert alert-warning" role="alert">
+    {%for field in err%}
+        {%for error in err[field]%}
+            <li>{{error}}</li>
+        {%endfor%}
     {%endfor%}
-{%endfor%}
+    </div>
+{%endif%}
 
-<form method="POST" action="{{url_for('auth_reg')}}">    
-    <table>
-        <tr>
-            <td>
-                {{reg_form.username.label}}                
-            </td>
-            <td>
-                {{reg_form.username}}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                {{reg_form.password.label}}                
-            </td>            
-            <td>
-                {{reg_form.password}}
-            </td>
-        </tr> 
-        <tr>
-            <td>
-                {{reg_form.password_repeat.label}}                
-            </td>            
-            <td>
-                {{reg_form.password_repeat}}
-            </td>
-        </tr>           
-        <tr>
-            <td>
-                <input type="submit" value="Register"/>
-            </td>
-        </tr>
-     </table>
-</form> 
+<div class="form">
+    <form method="POST" action="{{url_for('auth_reg')}}">
+        <h1 class="h3 mb-3 font-weight-normal">Please register your account</h1>
+        <label for="username" class="sr-only">{reg_form.username.label}}</label>
+        {{reg_form.username(class_="form-control", placeholder="Username")}}
+        <label for="password" class="sr-only">{{reg_form.password.label}}</label>
+        {{reg_form.password(class_="form-control", placeholder="Password")}}
+        <label for="password_repeat" class="sr-only">{{reg_form.password_repeat.label}}</label>
+        {{reg_form.password_repeat(class_="form-control", placeholder="Password")}}
+        <button class="btn btn-lg btn-primary" type="submit">Register</button>
+    </form>
+</div>
 
 <form method = "GET" action = "{{url_for('thread_index')}}">
-    <input type="submit" value="Back to threads"/>
+    <button class="btn btn-lg btn-primary" type="submit">Back to threads</button>
 </form> 
 {% endblock %}

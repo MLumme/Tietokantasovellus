@@ -2,35 +2,29 @@
 
 {% block body %}
 
-<li>{{err}}</li>
+{%if(err)%}
+    <div class="alert alert-warning" role="alert">
+    {%for field in err%}
+        {%for error in err[field]%}
+            <li>{{error}}</li>
+        {%endfor%}
+    {%endfor%}
+    </div>
+{%endif%}
 
-<form method="POST" action="{{url_for('auth_login')}}">
-    <table>
-        <tr>
-            <td>
-                {{login_form.username.label}}                
-            </td>
-            <td>
-                {{login_form.username}}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                {{login_form.password.label}}                
-            </td>            
-            <td>
-                {{login_form.password}}
-            </td>
-        </tr>        
-        <tr>
-            <td>
-                <input type="submit" value="Login"/>
-            </td>
-        </tr>
-     </table>
-</form> 
+<div class="form">
+    <form method="POST" action="{{url_for('auth_login')}}">
+        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        <label for="username" class="sr-only">{{login_form.username.label}}</label>
+        {{login_form.username(class_="form-control", placeholder="Username")}}
+        <label for="password" class="sr-only">{{login_form.password.label}}</label>
+        {{login_form.password(class_="form-control", placeholder="Password")}}
+        <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
+    </form>
+</div>
 
 <form method = "GET" action = "{{url_for('thread_index')}}">
-    <input type="submit" value="Back to threads"/>
-</form> 
+    <button class="btn btn-lg btn-primary" type="submit">Back to threads</button>
+</form>
+
 {% endblock %}

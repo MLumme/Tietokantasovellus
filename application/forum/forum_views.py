@@ -1,6 +1,7 @@
 from application import app, db
 from application.forum.forum_models import Thread, Message
 from application.forum.forum_forms import ThreadForm, MessageForm, NewThreadForm
+from application.auth.auth_models import User
 from flask import request, render_template, url_for, redirect
 from flask_login import login_required, current_user
 
@@ -39,11 +40,18 @@ def thread_new():
 @app.route("/forum/<thread_id>/", methods=["GET"])
 @login_required
 def thread_view(thread_id):
+    thread_contents = db.session().query(Thread.id,Thread.title,Message,User.username,User.id).\
+        filter(Thread.id == thread_id).\
+        join(Message, Message.thread_id == Thread.id).\
+        join(User, User.id == Message.user_id).all()
+
+    print("WARMIND", thread_contents[0].title)
+ 
     messages = Message.query.filter(Message.thread_id == thread_id).order_by(Message.date_posted).all()
-    
+
     message_form = MessageForm()
 
-    return render_template("forum/showmessages.html", messages = messages, thread_id = thread_id, message_form = message_form)
+    return render_template("forum/showmessages.html", messages = messages, thread_id = thread_id, message_form = message_form, thread_contents = thread_contents)
 
 #add new responses to thread
 @app.route("/forum/<thread_id>/new", methods = ["GET","POST"])
