@@ -22,9 +22,9 @@
                     <h4>{{message.username}}</h4> <br>
                     {{message.Message.date_posted.strftime('%d/%m/%Y %H:%M:%S')}} <br>
                     {{message.Message.date_edited.strftime('%d/%m/%Y %H:%M:%S')}} <br>
-                    <form method="POST" class="">
-                        <button class="btn btn-sm btn-primary" type="submit" formaction="">Edit</button>
-                        <button class="btn btn-sm btn-primary" type="submit" formaction="">Remove</button>
+                    <form method="GET" class="">
+                        <button class="btn btn-sm btn-primary" type="submit" formaction="{{url_for('msg_edit', message_id = message.Message.id)}}">Edit</button>
+                        <button class="btn btn-sm btn-primary" type="submit" formmethod="DELETE" formaction="{{url_for('msg_edit', message_id = message.Message.id)}}">Remove</button>
                     </form>
                 </td>
                 <td>

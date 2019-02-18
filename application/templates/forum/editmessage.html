@@ -1,11 +1,11 @@
 {% extends "layout.html" %} 
 
 {% block body %}
-<form method="POST" action="{{url_for('msg_edit_commit',message_id = message.id)}}">
+<form method="POST" action="{{url_for('msg_edit',message_id = message.id)}}">
     <table>
         <tr>
             <td>
-                {{messageForm.message(rows='10', cols='100')}}
+                {{message_form.message(rows='10', cols='100')}}
                 {{err}}
             </td>
         </tr>

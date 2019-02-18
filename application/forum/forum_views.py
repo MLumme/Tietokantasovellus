@@ -44,8 +44,6 @@ def thread_view(thread_id):
         filter(Thread.id == thread_id).\
         join(Message, Message.thread_id == Thread.id).\
         join(User, User.id == Message.user_id).all()
-
-    print("WARMIND", thread_contents[0].title)
  
     messages = Message.query.filter(Message.thread_id == thread_id).order_by(Message.date_posted).all()
 
@@ -67,7 +65,8 @@ def thread_add(thread_id):
     message_form = MessageForm(request.form)
 
     if(not message_form.validate()):
-        return render_template()
+        err = message_form.error
+        return render_template("forum/newmessage.html", message_form = message_form, thread_id = thread_id, err=err)
 
     message = Message(message_form.message.data, thread_id, current_user.get_id())
 
@@ -76,36 +75,31 @@ def thread_add(thread_id):
 
     return redirect(url_for("thread_view", thread_id = thread_id))    
 
-#remove message
-@app.route("/forum/msgremove/<message_id>", methods = ["POST"])
-@login_required
-def msg_remove(message_id):
-    message = Message.query.filter_by(id=message_id).one()
-    thread_id = message.thread_id
-
-    db.session.delete(message)
-    db.session.commit()
-
-    return redirect(url_for("thread_view", thread_id = thread_id))
-
-#edit message
-@app.route("/forum/msgedit/<message_id>", methods = ["POST"])
+#edit message and commit changes, or remove
+@app.route("/forum/message/<message_id>", methods = ["GET","POST","DELETE"])
 @login_required
 def msg_edit(message_id):
     message = Message.query.filter_by(id=message_id).one()
 
-    message_form = MessageForm()
-    message_form.message.data = message.content
+    if(request.method == "GET"):
+        message_form = MessageForm()
+        message_form.message.data = message.content
     
-    return render_template("forum/editmessage.html", message = message, message_form = message_form)
+        return render_template("forum/editmessage.html", message = message, message_form = message_form)
 
-#commit message edit
-@app.route("/forum/msgeditcommit/<message_id>", methods = ["POST"])
-@login_required
-def msg_edit_commit(message_id):
-    message = Message.query.filter_by(id=message_id).one()
+    if(request.method == "DELETE"):
+        thread_id = message.thread_id
+
+        db.session.delete(message)
+        db.session.commit()
+
+        return redirect(url_for("thread_view", thread_id = thread_id))
 
     messageForm = MessageForm(request.form)
+
+    if(not message_form.validate()):
+        err = message_form.error
+        return render_template("forum/editmessage.html", message = message, message_form = message_form, err=err)
 
     message.content = messageForm.message.data
 
