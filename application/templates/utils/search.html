@@ -1,0 +1,41 @@
+{% extends "layout.html" %} 
+
+{% block body %}
+
+{%if(err)%}
+    <div class="alert alert-warning" role="alert">
+    {%for field in err%}
+        {%for error in err[field]%}
+            <li>{{error}}</li>
+        {%endfor%}
+    {%endfor%}
+    </div>
+{%endif%}
+
+<div class="search-form">
+    <form method="POST" action="{{url_for('forum_search')}}">
+        <h1 class="h3 mb-3 font-weight-normal"></h1>
+        
+        <div class="form-group">
+            <label for="search">{{search_form.search.label}}</label>
+            {{search_form.search(class_="form-control", id_="search")}}
+        </div>
+
+        <div class="form-group">
+            <label for="search_from">{{search_form.search_from.label}}</label>
+            {{search_form.search_from(class_="form-control", id_="search_from")}}           
+        </div>
+
+        <div class="form-group">
+            <label for="search_subjects">{{search_form.search_subjects.label}}</label>
+            {{search_form.search_subjects(class_="form-control", id_="search_subjects")}}           
+        </div>
+
+        <button class="btn btn-lg btn-primary" type="submit">Search</button>
+    </form>
+</div>
+
+<form method = "GET" action = "{{url_for('thread_index')}}">
+    <button class="btn btn-lg btn-primary" type="submit">Back to threads</button>
+</form> 
+{% endblock %}

@@ -1,5 +1,5 @@
 from application import app, db
-from application.forum.forum_models import Thread, Message
+from application.forum.forum_models import Thread, Message, Subject, ThreadSubject
 from application.forum.forum_forms import ThreadForm, MessageForm, NewThreadForm
 from application.auth.auth_models import User
 from flask import request, render_template, url_for, redirect
@@ -108,3 +108,4 @@ def msg_edit(message_id):
     db.session.commit()
 
     return redirect(url_for("thread_view", thread_id = thread_id))
+    

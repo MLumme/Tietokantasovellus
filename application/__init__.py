@@ -17,6 +17,7 @@ db = SQLAlchemy(app)
 
 from application.forum import forum_models, forum_views
 from application.auth import auth_models, auth_views
+from application.utils import utils_views
 from application.auth.auth_models import User
 from os import urandom
 from flask_login import LoginManager

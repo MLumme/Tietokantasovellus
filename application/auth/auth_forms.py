@@ -58,6 +58,7 @@ class RegForm(LoginForm):
 
             #test if preexisting user has same username
             if(user):
+                err = "Username already taken"
                 self.username.errors.append(err)
                 error = True
 

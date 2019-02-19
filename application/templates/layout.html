@@ -27,11 +27,17 @@
                         </li>
                     {% endif %}
 
-                    {% if current_user.is_admin %}
+                    {% if current_user.is_authenticated and current_user.is_admin %}
                         <li>
-                            <a class="nav-link" href="{{url_for('thread_index')}}">Admin <span class="sr-only">(current)</span></a>                            
+                            <a class="nav-link" href="{{url_for('thread_index')}}">Admin Tools<span class="sr-only">(current)</span></a>                            
                         </li>                    
-                    {% endif %}    
+                    {% endif %}   
+                    
+                    {% if current_user.is_authenticated %}
+                    <li>
+                        <a class="nav-link" href="{{url_for('forum_search')}}">Search <span class="sr-only">(current)</span></a>                            
+                    </li>
+                {% endif %}
                 </ul>
                 
                 <div class="form-inline my-2 my-lg-0">
