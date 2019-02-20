@@ -1,5 +1,5 @@
 from application import app, db
-from application.forum.forum_models import Thread, Message, Subject, ThreadSubject
+from application.forum.forum_models import Thread, Message, Subject
 from application.forum.forum_forms import ThreadForm, MessageForm, NewThreadForm
 from application.auth.auth_models import User
 from flask import request, render_template, url_for, redirect
@@ -19,13 +19,20 @@ def thread_new():
     if(request.method == "GET"):
         new_thread_form = NewThreadForm()
 
+        subjects = [(subject.id, subject.name) for subject in Subject.query.all()]
+        new_thread_form.thread_subjects.choices = subjects
+
         return render_template("forum/newthread.html", new_thread_form = new_thread_form)    
 
     #else extract form, add new entries for thread and message tables
     new_thread_form = NewThreadForm(request.form)
 
-    thread = Thread(new_thread_form.thread_title.title.data,current_user.get_id())
+    subjects = Subject.query.filter(Subject.id.in_(new_thread_form.thread_subjects.data)).all()
 
+    thread = Thread(new_thread_form.thread_title.title.data,current_user.get_id(),subjects)
+    print("KILOKILOKILOKILO",subjects)
+    print(current_user.is_admin())
+    
     db.session().add(thread)
     db.session().flush()
 
@@ -33,9 +40,9 @@ def thread_new():
 
     db.session().add(message)
     db.session().commit()
-
+    
     return redirect(url_for("thread_index"))
-
+    
 #view thread with given thread_id
 @app.route("/forum/<thread_id>/", methods=["GET"])
 @login_required
@@ -71,7 +78,7 @@ def thread_add(thread_id):
 
     message = Message(message_form.message.data, thread_id, current_user.get_id())
     thread = Thread.query.filter_by(id=thread_id).one()
-
+     
     db.session.add(message)
     db.session.flush()
 

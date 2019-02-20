@@ -14,9 +14,16 @@
             <tbody>
                 <tr>
                     <td class=col>
-                        <div class="form-group" align="center">
-                            {{new_thread_form.thread_title.title(placeholder="Thread title", class_="form-control")}}<br>
+                        <div class="form-group" >
+                            {{new_thread_form.thread_title.title(placeholder="Thread title", class_="form-control")}}
+                        </div>    
+                        <div class="form-group">
                             {{new_thread_form.message_content.message(rows='10',cols='100', placeholder="Message", class_="form-control")}}<br>
+                        </div>
+                        <div class="form-group" align="center">
+                            {{new_thread_form.thread_subjects(class_="form-control thread-subjects")}}           
+                        </div>
+                        <div class="form-group" align="center">    
                             <button class="btn btn-lg btn-primary" type="submit">Post</button>
                             <button class="btn btn-lg btn-primary" formmethod="GET" formaction="{{url_for('thread_index')}}" type="submit">Cancel</button>
                         </div>

@@ -1,10 +1,11 @@
 from application import app, db
-from application.forum.forum_models import Thread, Message, Subject, ThreadSubject
+from application.forum.forum_models import Thread, Message, Subject
 from application.forum.forum_forms import ThreadForm, MessageForm, NewThreadForm
 from application.utils.utils_forms import SearchForm
 from application.auth.auth_models import User
 from flask import request, render_template, url_for, redirect
 from flask_login import login_required, current_user
+from sqlalchemy.sql import text
 
 #form for search functionality
 @app.route("/forum/search/", methods = ["GET","POST"])
@@ -15,8 +16,8 @@ def forum_search():
         search_form = SearchForm()
 
         subjects = [(subject.id, subject.name) for subject in Subject.query.all()]
-        search_form.search_subjects = subjects
-        
+        search_form.search_subjects.choices = subjects
+
         return render_template("utils/search.html", search_form = search_form)    
 
     #else extract form, run query to db and redirect
@@ -26,6 +27,13 @@ def forum_search():
     print(search_form.search.data)
     print(search_form.search_from.data)
     print(search_form.search_subjects.data)
+
+    if(search_form.search_from.data == 0):
+        stmt = text("SELECT * FROM account LEFT JOIN message "
+                    "ON message.user_id = Account.id WHERE "
+                    "Account.username LIKE '%:search%'").params(search = search_form.search.data)
+    
+    print(stmt)
 
     return redirect(url_for("thread_index"))
 

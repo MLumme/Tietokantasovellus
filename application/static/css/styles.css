@@ -14,3 +14,7 @@ body {
     padding: 15px;
     margin: auto;
 }
+
+.thread-subjects{
+    max-width: 500px;
+}

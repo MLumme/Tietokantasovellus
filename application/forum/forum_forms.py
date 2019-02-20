@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, FormField, validators
+from wtforms import StringField, TextAreaField, FormField, SelectMultipleField, validators
 
 class ThreadForm(FlaskForm):
     title = StringField("Title:", [validators.Length(min=1,max=200,message="Thread title must be between 1 and 200 characters")])
@@ -16,3 +16,4 @@ class MessageForm(FlaskForm):
 class NewThreadForm(FlaskForm):
     thread_title = FormField(ThreadForm)
     message_content = FormField(MessageForm)  
+    thread_subjects = SelectMultipleField("Select subjects:")
