@@ -1,17 +1,6 @@
 {% extends "layout.html" %} 
 
 {% block body %}
-
-{%if(err)%}
-    <div class="alert alert-warning" role="alert">
-    {%for field in err%}
-        {%for error in err[field]%}
-            <li>{{error}}</li>
-        {%endfor%}
-    {%endfor%}
-    </div>
-{%endif%}
-
 <div class="search-form">
     <form method="POST" action="{{url_for('forum_search')}}">
         <h1 class="h3 mb-3 font-weight-normal"></h1>

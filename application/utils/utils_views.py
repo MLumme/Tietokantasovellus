@@ -14,6 +14,9 @@ def forum_search():
     if(request.method == "GET"):
         search_form = SearchForm()
 
+        subjects = [(subject.id, subject.name) for subject in Subject.query.all()]
+        search_form.search_subjects = subjects
+        
         return render_template("utils/search.html", search_form = search_form)    
 
     #else extract form, run query to db and redirect

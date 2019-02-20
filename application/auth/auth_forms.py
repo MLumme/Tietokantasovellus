@@ -3,39 +3,15 @@ from wtforms import StringField, PasswordField, validators
 from application import db
 from application.auth.auth_models import User
 
+#class for username and pasword needed for login
 class LoginForm(FlaskForm):
-    username = StringField("Username:", [validators.Required("Username missing")]) 
-    password = PasswordField("Password:", [validators.Required("Password missing")])
-
-    def validate(self):
-        error = not FlaskForm.validate(self)
-
-        #validate if username long enough
-        if(len(self.username.data) < 5):
-            err = "Username too short, minimum 5"
-            self.username.errors.append(err)
-            error = True
-
-        #check if username too long
-        if(len(self.username.data) > 200):    
-            err = "Username too short, maximum 200"
-            self.username.errors.append(err)
-            error = True
-
-        #validate if password long enough
-        if(len(self.password.data) < 10):
-            err = "Password too short, minimum 10"
-            self.password.errors.append(err)
-            error = True
-
-        if(error):
-            return False
-
-        return True    
-
+    username = StringField("Username:", [validators.Required("Username missing"), validators.Length(min=4, max=200, message="Username must be between 5 and 200 characters long")]) 
+    password = PasswordField("Password:", [validators.Required("Password missing"), validators.Length(min=4, max=200, message="Password must be between 10 and 200 characters long")])
+   
     class Meta:
         csrf = False
 
+#class for registration form, inherits Loginform and its validators
 class RegForm(LoginForm):
     username = LoginForm.username 
     password = LoginForm.password

@@ -56,12 +56,13 @@ def thread_view(thread_id):
 @login_required
 def thread_add(thread_id):
 
+    #if GET render form for new message
     if(request.method == "GET"):
         message_form = MessageForm()
 
         return render_template("forum/newmessage.html", message_form = message_form, thread_id = thread_id)
 
-
+    #else send new message to db and update threads last modifiction date
     message_form = MessageForm(request.form)
 
     if(not message_form.validate()):
@@ -69,8 +70,12 @@ def thread_add(thread_id):
         return render_template("forum/newmessage.html", message_form = message_form, thread_id = thread_id, err=err)
 
     message = Message(message_form.message.data, thread_id, current_user.get_id())
+    thread = Thread.query.filter_by(id=thread_id).one()
 
     db.session.add(message)
+    db.session.flush()
+
+    thread.date_edited = message.date_posted
     db.session.commit()
 
     return redirect(url_for("thread_view", thread_id = thread_id))    
@@ -81,12 +86,14 @@ def thread_add(thread_id):
 def msg_edit(message_id):
     message = Message.query.filter_by(id=message_id).one()
 
+    #if GET render message edit form
     if(request.method == "GET"):
         message_form = MessageForm()
         message_form.message.data = message.content
     
         return render_template("forum/editmessage.html", message = message, message_form = message_form)
 
+    #if DELETE remove message, redirect back to thread
     if(request.method == "DELETE"):
         thread_id = message.thread_id
 
@@ -95,13 +102,14 @@ def msg_edit(message_id):
 
         return redirect(url_for("thread_view", thread_id = thread_id))
 
-    messageForm = MessageForm(request.form)
+    #else submit edits to db and redirect to thread
+    message_form = MessageForm(request.form)
 
     if(not message_form.validate()):
         err = message_form.error
         return render_template("forum/editmessage.html", message = message, message_form = message_form, err=err)
 
-    message.content = messageForm.message.data
+    message.content = message_form.message.data
 
     thread_id = message.thread_id
 

@@ -1,30 +1,29 @@
 {% extends "layout.html" %} 
 
 {% block body %}
-
-<form method="POST" action="{{url_for('thread_new')}}">
-    <table>
-        <tr>
-            <td>
-                {{new_thread_form.thread_title.title}}
-                {{err}}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                {{new_thread_form.message_content.message(rows='10',cols='100')}}
-                {{err}}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input type="submit" value="Post"/>
-            </td>
-        </tr>
-     </table> 
-</form>
-
-<form method = "GET" action = "{{url_for('thread_index')}}">
-    <input type="submit" value="Back to threads"/>
-</form> 
+<div class="container">
+    <form method="POST" action="{{url_for('thread_new')}}">
+        <table class="table">
+            <thead class="bg-dark text-light">
+                <tr>
+                    <th colspan=1 scope="col">
+                        <h4>New Thread</h4>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class=col>
+                        <div class="form-group" align="center">
+                            {{new_thread_form.thread_title.title(placeholder="Thread title", class_="form-control")}}<br>
+                            {{new_thread_form.message_content.message(rows='10',cols='100', placeholder="Message", class_="form-control")}}<br>
+                            <button class="btn btn-lg btn-primary" type="submit">Post</button>
+                            <button class="btn btn-lg btn-primary" formmethod="GET" formaction="{{url_for('thread_index')}}" type="submit">Cancel</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>   
+        </table>
+    </form>    
+</div>
 {% endblock %}

@@ -2,16 +2,6 @@
 
 {% block body %}
 
-{%if(err)%}
-    <div class="alert alert-warning" role="alert">
-    {%for field in err%}
-        {%for error in err[field]%}
-            <li>{{error}}</li>
-        {%endfor%}
-    {%endfor%}
-    </div>
-{%endif%}
-
 <div class="auth-form">
     <form method="POST" action="{{url_for('auth_login')}}">
         <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>

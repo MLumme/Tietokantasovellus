@@ -1,23 +1,30 @@
 {% extends "layout.html" %} 
 
 {% block body %}
-<form method="POST" action="{{url_for('msg_edit',message_id = message.id)}}">
-    <table>
-        <tr>
-            <td>
-                {{message_form.message(rows='10', cols='100')}}
-                {{err}}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input type="submit" value="Post edit"/>
-            </td>
-        </tr>
-     </table>
-</form>
-
-<form method = "GET" action = "{{url_for('thread_view', thread_id = message.thread_id)}}">
-    <input type="submit" value="Cancel"/>
-</form> 
+<div class="container">
+    <form method="POST" action="{{url_for('msg_edit',message_id = message.id)}}">
+        <table class="table">
+            <thead class="bg-dark text-light">
+                <tr>
+                    <th colspan=1 scope="col">
+                        <h4>New Message</h4>
+                    </th>
+                </tr>
+            </thead>
+    
+            <tbody>
+                <tr>
+                    <td class=col>
+                        <div class="form-group" align="center">
+                            <label for="search"></label>
+                            {{message_form.message(rows='10', cols='100', class_="textarea form-control")}}
+                            <button class="btn btn-lg btn-primary" type="submit">Post edit</button>
+                            <button class="btn btn-lg btn-primary" formmethod="GET" formaction="{{url_for('thread_view', thread_id = thread_id)}}" type="submit">Cancel</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>   
+        </table>
+    </form>    
+</div>
 {% endblock %}
