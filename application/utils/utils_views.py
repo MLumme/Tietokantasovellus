@@ -103,7 +103,7 @@ def forum_search():
                         " INNER JOIN message ON message.thread_id = thread.id"
                         " AND message.content LIKE ('%' || :search || '%')"
                         " INNER JOIN account ON account.id = message.user_id"
-                        " WHERE threadsubject.subject_id :subject "
+                        " WHERE threadsubject.subject_id = :subject "
                         " ORDER BY thread.id").params(search = search, subject = subject)
             message_search = db.engine.execute(stmt)
 

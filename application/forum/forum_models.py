@@ -1,4 +1,5 @@
 from application import db
+from sqlalchemy import event
 #from application.auth.auth_models import User
 
 association_table = db.Table("threadsubject", db.Model.metadata,
@@ -10,7 +11,7 @@ class Thread(db.Model):
     __tablename__ = "thread"
     id = db.Column(db.Integer, primary_key = True)
     date_posted = db.Column(db.DateTime, default = db.func.current_timestamp())
-    date_edited = db.Column(db.DateTime, default = db.func.current_timestamp())
+    date_edited = db.Column(db.DateTime, default = db.func.current_timestamp(), onupdate = db.func.current_timestamp())
     title = db.Column(db.String(200), nullable = False)
     messages = db.relationship("Message", cascade="all, delete-orphan")
     user_id = db.Column(db.Integer, db.ForeignKey('account.id'))
@@ -25,14 +26,13 @@ class Message(db.Model):
     __tablename__ = "message"
     id = db.Column(db.Integer, primary_key = True)
     date_posted = db.Column(db.DateTime, default = db.func.current_timestamp())
-    date_edited = db.Column(db.DateTime, default = db.func.current_timestamp(), onupdate = db.func.current_timestamp())
+    date_edited = db.Column(db.DateTime, default = db.func.current_timestamp())
     content = db.Column(db.String(1000), nullable = False)
     thread_id = db.Column(db.Integer,db.ForeignKey('thread.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('account.id'))
 
-    def __init__(self,content,thread_id,user_id):
+    def __init__(self,content,user_id):
         self.content = content
-        self.thread_id = thread_id  
         self.user_id = user_id   
 
 class Subject(db.Model):
@@ -42,3 +42,8 @@ class Subject(db.Model):
 
     def __init__(self, name):
         self.name = name
+
+#listens for addition of children to thread and updates last posts timestamp
+@event.listens_for(Thread.messages, "append")
+def receive_append_listener(target, value, initiator):
+    target.date_edited = db.func.current_timestamp()

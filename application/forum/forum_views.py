@@ -31,12 +31,11 @@ def thread_new():
 
     thread = Thread(new_thread_form.thread_title.title.data,current_user.get_id(),subjects)
     
+    message = Message(new_thread_form.message_content.message.data,current_user.get_id())
+
+    thread.messages = [message]
+
     db.session().add(thread)
-    db.session().flush()
-
-    message = Message(new_thread_form.message_content.message.data,thread.id,current_user.get_id())
-
-    db.session().add(message)
     db.session().commit()
     
     return redirect(url_for("thread_index"))
@@ -84,13 +83,14 @@ def thread_add(thread_id):
         err = message_form.error
         return render_template("forum/newmessage.html", message_form = message_form, thread_id = thread_id, err=err)
 
-    message = Message(message_form.message.data, thread_id, current_user.get_id())
+    message = Message(message_form.message.data, current_user.get_id())
+    
     thread = Thread.query.filter_by(id=thread_id).one()
-     
-    db.session.add(message)
+    thread.messages.append(message)
+
+    db.session.merge(thread)
     db.session.flush()
 
-    thread.date_edited = message.date_posted
     db.session.commit()
 
     return redirect(url_for("thread_view", thread_id = thread_id))    
