@@ -39,21 +39,21 @@ def forum_search():
     if(where == "0"):
         if(subject == "-1"):
             stmt = text("SELECT thread.* FROM thread"
-                        " INNER JOIN account ON account.username LIKE ('%' || :search || '%')"
+                        " INNER JOIN account ON LOWER(account.username) LIKE LOWER('%' || :search || '%')"
                         " AND account.id = thread.user_id"
                         " ORDER BY thread.id").params(search = search)
             thread_search = db.engine.execute(stmt)           
 
             stmt = text("SELECT thread.id, thread.title, account.id, account.username, message.* FROM thread" 
                         " INNER JOIN message ON message.thread_id = thread.id" 
-                        " INNER JOIN account ON account.username LIKE ('%' || :search || '%')" 
+                        " INNER JOIN account ON LOWER(account.username) LIKE LOWER('%' || :search || '%')" 
                         " AND account.id = message.user_id" 
                         " ORDER BY thread.id").params(search = search)
             message_search = db.engine.execute(stmt)
         else:   
             stmt = text("SELECT thread.* FROM threadsubject" 
                         " INNER JOIN thread ON threadsubject.thread_id = thread.id"
-                        " INNER JOIN account ON account.username LIKE ('%' || :search || '%')"
+                        " INNER JOIN account ON LOWER(account.username) LIKE LOWER('%' || :search || '%')"
                         " AND account.id = thread.user_id"
                         " WHERE threadsubject.subject_id = :subject"
                         " ORDER BY thread.id").params(search = search, subject = subject)
@@ -62,7 +62,7 @@ def forum_search():
             stmt = text("SELECT thread.id, thread.title, account.id, account.username, message.* FROM threadsubject" 
                         " INNER JOIN thread ON threadsubject.thread_id = thread.id" 
                         " INNER JOIN message ON message.thread_id = thread.id" 
-                        " INNER JOIN account ON account.username LIKE ('%' || :search || '%')" 
+                        " INNER JOIN account ON LOWER(account.username) LIKE LOWER('%' || :search || '%')" 
                         " AND account.id = message.user_id" 
                         " WHERE threadsubject.subject_id = :subject" 
                         " ORDER BY thread.id").params(search = search, subject = subject)
@@ -74,14 +74,14 @@ def forum_search():
     elif(where == "1"):
         if(subject == "-1"):
             stmt = text("SELECT thread.* FROM thread"
-                        " WHERE thread.title LIKE ('%' || :search || '%')"
+                        " WHERE LOWER(thread.title) LIKE LOWER('%' || :search || '%')"
                         " ORDER BY thread.id").params(search = search)
             thread_search = db.engine.execute(stmt)
 
         else:
             stmt = text("SELECT thread.* FROM threadsubject"
                         " INNER JOIN thread ON threadsubject.thread_id = thread.id"
-                        " AND thread.title LIKE ('%' || :search || '%')"
+                        " AND LOWER(thread.title) LIKE LOWER('%' || :search || '%')"
                         " WHERE threadsubject.subject_id = :subject "
                         " ORDER BY thread.id").params(search = search, subject = subject)
             thread_search = db.engine.execute(stmt)
@@ -93,7 +93,7 @@ def forum_search():
         if(subject == "-1"):
             stmt = text("SELECT thread.id, thread.title, account.id, account.username, message.* FROM thread "
                         " INNER JOIN message ON message.thread_id = thread.id"
-                        " AND message.content LIKE ('%' || :search || '%')"
+                        " AND LOWER(message.content) LIKE LOWER('%' || :search || '%')"
                         " INNER JOIN account ON account.id = message.user_id"
                         " ORDER BY thread.id").params(search = search)
             message_search = db.engine.execute(stmt)       
@@ -101,7 +101,7 @@ def forum_search():
             stmt = text("SELECT thread.id, thread.title, account.id, account.username, message.* FROM threadsubject"
                         " INNER JOIN thread ON threadsubject.thread_id = thread.id"
                         " INNER JOIN message ON message.thread_id = thread.id"
-                        " AND message.content LIKE ('%' || :search || '%')"
+                        " AND LOWER(message.content) LIKE LOWER('%' || :search || '%')"
                         " INNER JOIN account ON account.id = message.user_id"
                         " WHERE threadsubject.subject_id = :subject "
                         " ORDER BY thread.id").params(search = search, subject = subject)
