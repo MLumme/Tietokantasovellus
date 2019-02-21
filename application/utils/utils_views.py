@@ -15,7 +15,9 @@ def forum_search():
     if(request.method == "GET"):
         search_form = SearchForm()
 
-        subjects = [(subject.id, subject.name) for subject in Subject.query.all()]
+        subjects = [(-1,"none")]
+        subjects.extend([(subject.id, subject.name) for subject in Subject.query.all()])
+        print(subjects)
         search_form.search_subjects.choices = subjects
 
         return render_template("utils/search.html", search_form = search_form)    
@@ -23,31 +25,94 @@ def forum_search():
     #else extract form, run query to db and redirect
     search_form = SearchForm(request.form)
 
-    print("KILOKILOKILOKILO")
     print(search_form.search.data)
     print(search_form.search_from.data)
     print(search_form.search_subjects.data)
 
-    if(search_form.search_from.data == 0):
-        stmt = text("SELECT * FROM account LEFT JOIN message "
-                    "ON message.user_id = Account.id WHERE "
-                    "Account.username LIKE '%:search%'").params(search = search_form.search.data)
-    
-    print(stmt)
+    #ctract searchstring, subject id, and integer denoting on ehat the search is done on
+    search = search_form.search.data 
+    where = search_form.search_from.data
+    subject = search_form.search_subjects.data  
 
-    return redirect(url_for("thread_index"))
+    print("ALPHAALPHAALPHA", where, subject)
+    #search messages and threads by username
+    if(where == "0"):
+        if(subject == "-1"):
+            stmt = text("SELECT thread.* FROM thread"
+                        " INNER JOIN account ON account.username LIKE ('%' || :search || '%')"
+                        " AND account.id = thread.user_id"
+                        " ORDER BY thread.id").params(search = search)
+            thread_search = db.engine.execute(stmt)           
 
-    """new_thread_form = NewThreadForm(request.form)
+            stmt = text("SELECT thread.id, thread.title, account.id, account.username, message.* FROM thread" 
+                        " INNER JOIN message ON message.thread_id = thread.id" 
+                        " INNER JOIN account ON account.username LIKE ('%' || :search || '%')" 
+                        " AND account.id = message.user_id" 
+                        " ORDER BY thread.id").params(search = search)
+            message_search = db.engine.execute(stmt)
+        else:   
+            stmt = text("SELECT thread.* FROM threadsubject" 
+                        " INNER JOIN thread ON threadsubject.thread_id = thread.id"
+                        " INNER JOIN account ON account.username LIKE ('%' || :search || '%')"
+                        " AND account.id = thread.user_id"
+                        " WHERE threadsubject.subject_id = :subject"
+                        " ORDER BY thread.id").params(search = search, subject = subject)
+            thread_search = db.engine.execute(stmt)
+            
+            stmt = text("SELECT thread.id, thread.title, account.id, account.username, message.* FROM threadsubject" 
+                        " INNER JOIN thread ON threadsubject.thread_id = thread.id" 
+                        " INNER JOIN message ON message.thread_id = thread.id" 
+                        " INNER JOIN account ON account.username LIKE ('%' || :search || '%')" 
+                        " AND account.id = message.user_id" 
+                        " WHERE threadsubject.subject_id = :subject" 
+                        " ORDER BY thread.id").params(search = search, subject = subject)
+            message_search = db.engine.execute(stmt)
 
-    thread = Thread(new_thread_form.thread_title.title.data,current_user.get_id())
+        return render_template("utils/searchresults.html", message_search = message_search, thread_search = thread_search)
 
-    db.session().add(thread)
-    db.session().flush()
+    #search by thread title
+    elif(where == "1"):
+        if(subject == "-1"):
+            stmt = text("SELECT thread.* FROM thread"
+                        " WHERE thread.title LIKE ('%' || :search || '%')"
+                        " ORDER BY thread.id").params(search = search)
+            thread_search = db.engine.execute(stmt)
 
-    message = Message(new_thread_form.message_content.message.data,thread.id,current_user.get_id())
+        else:
+            stmt = text("SELECT thread.* FROM threadsubject"
+                        " INNER JOIN thread ON threadsubject.thread_id = thread.id"
+                        " AND thread.title LIKE ('%' || :search || '%')"
+                        " WHERE threadsubject.subject_id = :subject "
+                        " ORDER BY thread.id").params(search = search, subject = subject)
+            thread_search = db.engine.execute(stmt)
 
-    db.session().add(message)
-    db.session().commit()
-    
-    return redirect(url_for("thread_index"))
-    """
+        return render_template("utils/searchresults.html", thread_search = thread_search)
+
+    #search by message contents    
+    elif(where == "2"):
+        if(subject == "-1"):
+            stmt = text("SELECT thread.id, thread.title, account.id, account.username, message.* FROM thread "
+                        " INNER JOIN message ON message.thread_id = thread.id"
+                        " AND message.content LIKE ('%' || :search || '%')"
+                        " INNER JOIN account ON account.id = message.user_id"
+                        " ORDER BY thread.id").params(search = search)
+            message_search = db.engine.execute(stmt)       
+        else:       
+            stmt = text("SELECT thread.id, thread.title, account.id, account.username, message.* FROM threadsubject"
+                        " INNER JOIN thread ON threadsubject.thread_id = thread.id"
+                        " INNER JOIN message ON message.thread_id = thread.id"
+                        " AND message.content LIKE ('%' || :search || '%')"
+                        " INNER JOIN account ON account.id = message.user_id"
+                        " WHERE threadsubject.subject_id :subject "
+                        " ORDER BY thread.id").params(search = search, subject = subject)
+            message_search = db.engine.execute(stmt)
+
+        return render_template("utils/searchresults.html", message_search = message_search)
+
+    #something very wrong has happpened te end up here and I don't even know how
+    else:
+        return render_template("forum/showthreads.html")
+
+"""
+SELECT thread.*, account.*, message.* FROM thread INNER JOIN message ON message.thread_id = thread.id INNER JOIN account ON account.username LIKE ('%' || world || '%') AND account.id = message.user_id ORDER BY thread.id
+"""

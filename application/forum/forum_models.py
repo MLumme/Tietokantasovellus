@@ -12,7 +12,7 @@ class Thread(db.Model):
     date_posted = db.Column(db.DateTime, default = db.func.current_timestamp())
     date_edited = db.Column(db.DateTime, default = db.func.current_timestamp())
     title = db.Column(db.String(200), nullable = False)
-    messages = db.relationship("Message")
+    messages = db.relationship("Message", cascade="all, delete-orphan")
     user_id = db.Column(db.Integer, db.ForeignKey('account.id'))
     subjects = db.relationship("Subject", secondary=association_table)
 

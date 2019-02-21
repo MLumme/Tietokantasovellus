@@ -5,7 +5,7 @@ from application.auth.auth_models import User
 from flask import request, render_template, url_for, redirect
 from flask_login import login_required, current_user
 
-#show list of threads, eventually forum index
+#show list of threads
 @app.route("/forum/", methods = ["GET"])
 def thread_index():
     threads = Thread.query.all()
@@ -30,8 +30,6 @@ def thread_new():
     subjects = Subject.query.filter(Subject.id.in_(new_thread_form.thread_subjects.data)).all()
 
     thread = Thread(new_thread_form.thread_title.title.data,current_user.get_id(),subjects)
-    print("KILOKILOKILOKILO",subjects)
-    print(current_user.is_admin())
     
     db.session().add(thread)
     db.session().flush()
@@ -43,20 +41,30 @@ def thread_new():
     
     return redirect(url_for("thread_index"))
     
-#view thread with given thread_id
-@app.route("/forum/<thread_id>/", methods=["GET"])
+#view thread with given thread_id, or delete it
+@app.route("/forum/<thread_id>/", methods = ["GET","POST"])
 @login_required
 def thread_view(thread_id):
+    #thread deletion
+    if(request.method == "POST" and current_user.is_admin()):
+        thread = db.session().query(Thread).filter_by(id = thread_id).first()
+        
+        db.session().delete(thread)
+        db.session().commit()
+
+        return redirect(url_for("thread_index"))
+
+
     thread_contents = db.session().query(Thread.id,Thread.title,Message,User.username,User.id).\
         filter(Thread.id == thread_id).\
         join(Message, Message.thread_id == Thread.id).\
         join(User, User.id == Message.user_id).all()
- 
-    messages = Message.query.filter(Message.thread_id == thread_id).order_by(Message.date_posted).all()
 
     message_form = MessageForm()
 
-    return render_template("forum/showmessages.html", messages = messages, thread_id = thread_id, message_form = message_form, thread_contents = thread_contents)
+    return render_template("forum/showmessages.html", thread_id = thread_id, message_form = message_form, thread_contents = thread_contents)
+
+
 
 #add new responses to thread
 @app.route("/forum/<thread_id>/new", methods = ["GET","POST"])
@@ -87,8 +95,8 @@ def thread_add(thread_id):
 
     return redirect(url_for("thread_view", thread_id = thread_id))    
 
-#edit message and commit changes, or remove
-@app.route("/forum/message/<message_id>", methods = ["GET","POST","DELETE"])
+#edit message and commit changes
+@app.route("/forum/message/<message_id>", methods = ["GET","POST"])
 @login_required
 def msg_edit(message_id):
     message = Message.query.filter_by(id=message_id).one()
@@ -99,15 +107,6 @@ def msg_edit(message_id):
         message_form.message.data = message.content
     
         return render_template("forum/editmessage.html", message = message, message_form = message_form)
-
-    #if DELETE remove message, redirect back to thread
-    if(request.method == "DELETE"):
-        thread_id = message.thread_id
-
-        db.session.delete(message)
-        db.session.commit()
-
-        return redirect(url_for("thread_view", thread_id = thread_id))
 
     #else submit edits to db and redirect to thread
     message_form = MessageForm(request.form)
@@ -123,4 +122,18 @@ def msg_edit(message_id):
     db.session.commit()
 
     return redirect(url_for("thread_view", thread_id = thread_id))
-    
+
+
+#delete messages
+@app.route("/forum/message/<message_id>/delete", methods = ["POST"])
+@login_required
+def msg_remove(message_id):
+    if(current_user.is_admin()):
+        message = Message.query.filter_by(id=message_id).one()
+
+        thread_id = message.thread_id
+
+        db.session.delete(message)
+        db.session.commit()
+
+    return redirect(url_for("thread_view", thread_id = thread_id))

@@ -18,3 +18,23 @@ body {
 .thread-subjects{
     max-width: 500px;
 }
+
+.message-row{
+    min-height: 200px;
+}
+
+.user-row{
+    position: absolute;
+}
+
+.info-row{
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+}
+
+.header{
+    min-height: 40;
+    vertical-align: middle;
+    font-weight: bold;
+}
