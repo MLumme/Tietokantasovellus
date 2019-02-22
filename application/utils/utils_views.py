@@ -112,7 +112,3 @@ def forum_search():
     #something very wrong has happpened te end up here and I don't even know how
     else:
         return render_template("forum/showthreads.html")
-
-"""
-SELECT thread.*, account.*, message.* FROM thread INNER JOIN message ON message.thread_id = thread.id INNER JOIN account ON account.username LIKE ('%' || world || '%') AND account.id = message.user_id ORDER BY thread.id
-"""
