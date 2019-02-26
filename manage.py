@@ -16,6 +16,12 @@ def create_admin():
     admin.admin = True
     
     db.session.add(admin)
+
+    deleteduser = User("deleted user","Password1234")
+    deleteduser.id = 0
+
+    db.session.add(deleteduser)
+
     db.session.commit()
 
 if __name__ == "__main__":

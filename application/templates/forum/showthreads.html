@@ -4,53 +4,45 @@
         Threads
     </div>
 
-    <div class="container" align="left">
-        <div class="row table-primary header">
-            <div class="col border">
-                Title
-            </div>
-            <div class="col-2 border">
-                Created on:
-            </div>
-            <div class="col-2 border">
-                Last posted on:
-            </div>
+    <div class="container">
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th class="col-7" scope="col">Title</th>
+                    <th class="col-2" scope="col">Created</th>
+                    <th class="col-2" scope="col">Last Posted</th>
+                    {% if current_user.is_authenticated and current_user.is_admin() %}
+                        <th class="col-1" scope="col"></th>
+                    {% endif %}
+                </tr>
+            </thead>
 
-            {% if current_user.is_authenticated and current_user.is_admin() %}
-                <div class="col-1 border"></div>
-            {% endif %}
-        </div>
+            <tbody>
+                {% for thread in threads %}
+                <tr>
+                    <td><a href="{{url_for('thread_view', thread_id = thread.id)}}">{{thread.title}}</a></td>
+                    <td>{{thread.date_posted}}</td>
+                    <td>{{thread.date_edited}}</td>
+                    {% if current_user.is_authenticated and current_user.is_admin() %}
+                        <td>
+                            <form method="POST" action="{{url_for('thread_view', thread_id = thread.id)}}">
+                                <button class="btn btn-sm btn-danger" type="submit">Remove</button>
+                            </form>
+                        </td>
+                    {% endif %}    
+                </tr>
+                {% endfor %}
+            </tbody>
 
-        {% for thread in threads %}
-            <div class="row">
-                <div class="col border">
-                    <a href="{{url_for('thread_view', thread_id = thread.id)}}">{{thread.title}}</a>
-                </div>
-                <div class="col-2 border">
-                    {{thread.date_posted}}
-                </div>
-                <div class="col-2 border">
-                    {{thread.date_edited}}
-                </div>
-                {% if current_user.is_authenticated and current_user.is_admin() %}
-                <div class="col-1 border">
-                    <form method="POST" action="{{url_for('thread_view', thread_id = thread.id)}}">
-                        <button class="btn btn-sm btn-danger" type="submit">Remove</button>
-                    </form>
-                </div>
-            {% endif %} 
-            </div>
-        {% endfor %}
-
-        <div class="row table-primary header" align="center">
-            <div colspan=12 class="col border">
-                <form method="GET" action = "{{url_for('thread_new')}}">
-                    <button class="btn btn-sm btn-primary" type="submit">Add a new thread</button>
-                </form> 
-            </div>
-        </div>
+            <thead class="table-primary">
+                <tr>
+                    <th colspan="12" class="text-center" scope="col">
+                        <form method="GET" action = "{{url_for('thread_new')}}">
+                            <button class="btn btn-sm btn-primary" type="submit">Add a new thread</button>
+                        </form>
+                    </th>
+                </tr>
+            </thead> 
+        </table>      
     </div>
-        
-
-
 {% endblock %}        

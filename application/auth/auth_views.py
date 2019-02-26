@@ -70,4 +70,4 @@ def auth_reg():
     db.session.add(user)
     db.session.commit()
 
-    return redirect(url_for("auth_login"))    
+    return redirect(url_for("auth_login"))

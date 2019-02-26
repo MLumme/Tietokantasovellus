@@ -4,9 +4,9 @@
 <div class="container">
     <form method="POST" action="{{url_for('thread_new')}}">
         <table class="table">
-            <thead class="bg-dark text-light">
+            <thead class="table-primary text-center">
                 <tr>
-                    <th colspan=1 scope="col">
+                    <th colspan=12 scope="col">
                         <h4>New Thread</h4>
                     </th>
                 </tr>
@@ -15,13 +15,13 @@
                 <tr>
                     <td class=col>
                         <div class="form-group" >
-                            {{new_thread_form.thread_title.title(placeholder="Thread title", class_="form-control")}}
+                            {{thread_form.title(placeholder="Thread title", class_="form-control")}}
                         </div>    
                         <div class="form-group">
-                            {{new_thread_form.message_content.message(rows='10',cols='100', placeholder="Message", class_="form-control")}}<br>
+                            {{thread_form.message(rows='10',cols='100', placeholder="Message", class_="form-control")}}<br>
                         </div>
                         <div class="form-group" align="center">
-                            {{new_thread_form.thread_subjects(class_="form-control thread-subjects")}}           
+                            {{thread_form.subjects(class_="form-control thread-subjects")}}           
                         </div>
                         <div class="form-group" align="center">    
                             <button class="btn btn-lg btn-primary" type="submit">Post</button>

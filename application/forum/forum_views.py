@@ -1,6 +1,6 @@
 from application import app, db
 from application.forum.forum_models import Thread, Message, Subject
-from application.forum.forum_forms import ThreadForm, MessageForm, NewThreadForm
+from application.forum.forum_forms import MessageForm, ThreadForm
 from application.auth.auth_models import User
 from flask import request, render_template, url_for, redirect
 from flask_login import login_required, current_user
@@ -17,21 +17,27 @@ def thread_index():
 def thread_new():
     #if get send to thread creation form
     if(request.method == "GET"):
-        new_thread_form = NewThreadForm()
+        thread_form = ThreadForm()
 
         subjects = [(subject.id, subject.name) for subject in Subject.query.all()]
-        new_thread_form.thread_subjects.choices = subjects
+        thread_form.subjects.choices = subjects
 
-        return render_template("forum/newthread.html", new_thread_form = new_thread_form)    
+        return render_template("forum/newthread.html", thread_form = thread_form)    
 
     #else extract form, add new entries for thread and message tables
-    new_thread_form = NewThreadForm(request.form)
+    thread_form = ThreadForm(request.form)
 
-    subjects = Subject.query.filter(Subject.id.in_(new_thread_form.thread_subjects.data)).all()
+    if(not thread_form.validate()):
+        err = thread_form.errors
+        print(err)
+        return render_template("forum/newthread.html", thread_form = thread_form, err=err)
 
-    thread = Thread(new_thread_form.thread_title.title.data,current_user.get_id(),subjects)
+
+    subjects = Subject.query.filter(Subject.id.in_(thread_form.subjects.data)).all()
+
+    thread = Thread(thread_form.title.data,current_user.get_id(),subjects)
     
-    message = Message(new_thread_form.message_content.message.data,current_user.get_id())
+    message = Message(thread_form.message.data,current_user.get_id())
 
     thread.messages = [message]
 
@@ -80,7 +86,7 @@ def thread_add(thread_id):
     message_form = MessageForm(request.form)
 
     if(not message_form.validate()):
-        err = message_form.error
+        err = message_form.errors
         return render_template("forum/newmessage.html", message_form = message_form, thread_id = thread_id, err=err)
 
     message = Message(message_form.message.data, current_user.get_id())
@@ -112,7 +118,7 @@ def msg_edit(message_id):
     message_form = MessageForm(request.form)
 
     if(not message_form.validate()):
-        err = message_form.error
+        err = message_form.errors
         return render_template("forum/editmessage.html", message = message, message_form = message_form, err=err)
 
     message.content = message_form.message.data
