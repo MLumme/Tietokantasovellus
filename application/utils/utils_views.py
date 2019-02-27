@@ -37,7 +37,7 @@ def user_page(user_id):
 
         #if user deleted themselves redirect to logout, else sen back to thread index
         if(current_user.id == user_id):
-            return render_template(url_for('auth_logout'))
+            return redirect(url_for('auth_logout'))
 
         return redirect(url_for("thread_index")) 
 
@@ -79,7 +79,7 @@ def user_password(user_id):
 
     #if user changed own password logout
     if(str(current_user.id) == user_id):
-        return render_template(url_for('auth_logout'))
+        return redirect(url_for('auth_logout'))
 
     return redirect(url_for("thread_index")) 
 
