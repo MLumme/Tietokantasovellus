@@ -17,8 +17,6 @@ def auth_login():
 
     login_form = LoginForm(request.form)
 
-    print("kilo", file=sys.stderr)
-
     #validate that field imputs correct
     if(not login_form.validate()):
         err = login_form.errors

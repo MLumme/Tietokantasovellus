@@ -49,8 +49,8 @@ class RegForm(LoginForm):
 
 #class for changing passwords
 class PswChangeForm(FlaskForm):
-    old_password = PasswordField("Password:", [validators.Required("Old password missing"), validators.Length(min=4, max=200, message="Password must be between 10 and 200 characters long")])
-    new_password = PasswordField("Password:", [validators.Required("New password missing"), validators.Length(min=4, max=200, message="Password must be between 10 and 200 characters long")])
+    old_password = PasswordField("Password:", [validators.Required("Old password missing"), validators.Length(min=10, max=200, message="Password must be between 10 and 200 characters long")])
+    new_password = PasswordField("Password:", [validators.Required("New password missing"), validators.Length(min=10, max=200, message="Password must be between 10 and 200 characters long")])
     rep_password = PasswordField("Password:", [validators.Required("New password confirmation missing")])
 
    #custom validator for password similarity
@@ -58,9 +58,9 @@ class PswChangeForm(FlaskForm):
         error = not FlaskForm.validate(self)
 
         #test if password and repeat matches
-        if(self.password.data != self.password_repeat.data):
+        if(self.new_password.data != self.rep_password.data):
             err = "Passwords do not match"
-            self.password.errors.append(err)
+            self.new_password.errors.append(err)
             error = True
 
         if(error):

@@ -14,8 +14,8 @@
 </ul> 
 
 <div class="tab-content" id="tabContent">
-    <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-        <table class="table">
+    <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab" align=center>
+        <table class="table thread-subjects">
             <tbody>
                 <tr>
                     <td>
@@ -63,13 +63,13 @@
                 {{username_change_form.new_username(class_="form-control", placeholder="New Username")}}
                 <label for="rep_username" class="sr-only">{{username_change_form.rep_username.label}}</label>
                 {{username_change_form.rep_username(class_="form-control", placeholder="Repeat Username")}}
-                <button class="btn btn-lg btn-primary" type="submit">Register</button>
+                <button class="btn btn-lg btn-primary" type="submit">Change</button>
             </form>
         </div>
     </div>
     <div class="tab-pane fade" id="changepsw" role="tabpanel" aria-labelledby="changepsw-tab">
         <div class="auth-form">
-            <form method="POST" action="{{url_for('user_password', user_id=user_info.id)}}">
+            <form method="POST" action="{{url_for('user_password', user_id = user_info.id)}}">
                 <h1 class="h3 mb-3 font-weight-normal">Change password</h1>
                 <label for="new_password" class="sr-only">{{password_change_form.old_password.label}}</label>
                 {{password_change_form.old_password(class_="form-control", placeholder="Old password")}}
@@ -77,7 +77,7 @@
                 {{password_change_form.new_password(class_="form-control", placeholder="New passsword")}}
                 <label for="rep_password" class="sr-only">{{password_change_form.rep_password.label}}</label>
                 {{password_change_form.rep_password(class_="form-control", placeholder="Repeat password")}}
-                <button class="btn btn-lg btn-primary" type="submit">Register</button>
+                <button class="btn btn-lg btn-primary" type="submit">Change</button>
             </form>
         </div>
     </div>

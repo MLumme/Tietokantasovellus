@@ -42,13 +42,7 @@ def user_page(user_id):
         return redirect(url_for("thread_index")) 
 
     #else render infor on user and pages for password and username change
-    stmt = text("SELECT account.id, account.username, account.date_posted,"
-                " COUNT(DISTINCT thread.id) AS threadcount,"
-                " COUNT(DISTINCT message.id) AS postcount FROM account"
-                " LEFT JOIN thread ON thread.user_id = account.id"
-                " LEFT JOIN message ON message.user_id = account.id"
-                " WHERE account.id = :user_id GROUP BY account.id").params(user_id = user_id)
-    user_info = db.engine.execute(stmt).fetchone()
+    user_info = User.get_user_info(user_id)
 
     password_change_form = PswChangeForm()
     username_change_form = UsrChangeForm()
@@ -58,13 +52,61 @@ def user_page(user_id):
 @app.route("/forum/user/<user_id>/changepsw",methods = ["POST"])
 @login_required
 def user_password(user_id):
+    #check that user is attempting to change their own password, or is admin
+    if(not(current_user.is_admin()) and (str(current_user.id) != user_id)):
+        err = {"privilegeerror": ["Insufficient user privileges to use this function"]}
+        return render_template("forum/showthreads.html",err=err)
+
+    password_change_form = PswChangeForm(request.form)
+
+    #validate that field imputs correct
+    if(not password_change_form.validate()):
+        user_info = User.get_user_info(user_id)
+        err = password_change_form.errors
+        return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, err = err)
+
+    #check if old password is correct
+    user = User.query.filter_by(id = user_id, password = password_change_form.old_password.data).first()
+
+    if(not user):                
+        user_info = User.get_user_info(user_id)
+        err = {'Error':['Old password incorrect']}
+        return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, err = err)
+
+    #replace password, commit to database
+    user.password = password_change_form.new_password.data
+    db.session.commit()
+
+    #if user changed own password logout
+    if(str(current_user.id) == user_id):
+        return render_template(url_for('auth_logout'))
+
     return redirect(url_for("thread_index")) 
 
 @app.route("/forum/user/<user_id>/changeusr",methods = ["POST"])
 @login_required
 def user_username(user_id):
+    #check that user is attempting to change their own username, or is admin
+    if(not(current_user.is_admin()) and (str(current_user.id) != user_id)):
+        err = {"privilegeerror": ["Insufficient user privileges to use this function"]}
+        return render_template("forum/showthreads.html",err=err)
+
+    username_change_form = UsrChangeForm(request.form)
+
+    #validate that field imputs correct, also tests if new username is already taken
+    if(not username_change_form.validate()):
+        user_info = User.get_user_info(user_id)
+        err = username_change_form.errors            
+        return render_template("utils/userpage.html", user_info = user_info, username_change_form = username_change_form, err = err)
+
+    #replace username, commit to database
+    user = User.query.filter_by(id = user_id).first()
+    user.username = username_change_form.new_username.data
+
+    db.session.commit()
+
     return redirect(url_for("thread_index"))
- 
+
 #form for search functionality
 @app.route("/forum/search/", methods = ["GET","POST"])
 @login_required

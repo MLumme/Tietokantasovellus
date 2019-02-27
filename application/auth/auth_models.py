@@ -1,5 +1,5 @@
 from application import db
-#from application.forum.forum_models import Thread, Message
+from sqlalchemy.sql import text
 
 class User(db.Model):
     __tablename__ = "account"
@@ -30,3 +30,15 @@ class User(db.Model):
 
     def is_admin(self):
         return self.admin
+
+    @staticmethod
+    def get_user_info(user_id):
+        stmt = text("SELECT account.id, account.username, account.date_posted,"
+                    " COUNT(DISTINCT thread.id) AS threadcount,"
+                    " COUNT(DISTINCT message.id) AS postcount FROM account"
+                    " LEFT JOIN thread ON thread.user_id = account.id"
+                    " LEFT JOIN message ON message.user_id = account.id"
+                    " WHERE account.id = :user_id GROUP BY account.id").params(user_id = user_id)
+        user_info = db.engine.execute(stmt).fetchone()    
+
+        return user_info
