@@ -11,7 +11,7 @@ class MessageForm(FlaskForm):
 class ThreadForm(MessageForm):
     title = StringField("Title:", [validators.Length(min=1,max=200,message="Thread title must be between 1 and 200 characters")])
     message = MessageForm.message 
-    subjects = SelectMultipleField("Select subjects:", choices=[])
+    subjects = SelectMultipleField("Select subjects:", coerce=int, choices=[])
 
     class Meta:
         csrf = False

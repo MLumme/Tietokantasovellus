@@ -1,7 +1,7 @@
 from application import app, db
 from application.forum.forum_models import Thread, Message, Subject
 from application.forum.forum_forms import ThreadForm, MessageForm, ThreadForm
-from application.utils.utils_forms import SearchForm
+from application.utils.utils_forms import SearchForm, SubjectForm
 from application.auth.auth_models import User
 from application.auth.auth_forms import PswChangeForm, UsrChangeForm
 from flask import request, render_template, url_for, redirect
@@ -10,7 +10,7 @@ from sqlalchemy.sql import text
 
 #functionality for user to view their information and delete themselves, or for 
 # admin to do the same to other users 
-@app.route("/forum/user/<user_id>",methods = ["GET","POST"])
+@app.route("/util/user/<user_id>",methods = ["GET","POST"])
 @login_required
 def user_page(user_id):
     #allow rights to view or delete profile only to users themselves or admins
@@ -49,7 +49,8 @@ def user_page(user_id):
 
     return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form)
 
-@app.route("/forum/user/<user_id>/changepsw",methods = ["POST"])
+#change password
+@app.route("/util/user/<user_id>/changepsw",methods = ["POST"])
 @login_required
 def user_password(user_id):
     #check that user is attempting to change their own password, or is admin
@@ -84,7 +85,8 @@ def user_password(user_id):
 
     return redirect(url_for("thread_index")) 
 
-@app.route("/forum/user/<user_id>/changeusr",methods = ["POST"])
+#change username
+@app.route("/util/user/<user_id>/changeusr",methods = ["POST"])
 @login_required
 def user_username(user_id):
     #check that user is attempting to change their own username, or is admin
@@ -109,8 +111,50 @@ def user_username(user_id):
 
     return redirect(url_for("thread_index"))
 
+#functionality for admins to view and manipulate users and add subjects to use in threads
+@app.route("/util/admin", methods = ["GET","POST"])
+@login_required
+def forum_admin():
+    if(not current_user.is_admin()):
+        return redirect(url_for("thread_index"))
+
+    if(request.method == "GET"):
+        subject_form = SubjectForm()
+        users = User.get_all_user_info(current_user.id)
+        subjects = Subject.query.all()
+
+        return render_template("utils/adminpage.html", subject_form = subject_form, users = users, subjects = subjects) 
+
+    #add new subject
+    subject_form = SubjectForm(request.form)
+
+    subject = Subject(subject_form.subject.data)
+    
+    db.session.add(subject)
+    db.session.commit()
+
+    return redirect(url_for("forum_admin"))
+
+#make user admin
+@app.route("/util/user/<user_id>/admin",methods = ["POST"])
+@login_required
+def user_admin(user_id):
+    if(not current_user.is_admin()):
+        return redirect(url_for("thread_index"))
+
+    user = User.query.get(user_id)
+
+    if(user.is_admin()):
+        return redirect(url_for("thread_index"))
+
+    user.admin = True
+    db.session.commit()
+    
+    print(user)
+    return redirect(url_for("forum_admin"))
+
 #form for search functionality
-@app.route("/forum/search/", methods = ["GET","POST"])
+@app.route("/util/search/", methods = ["GET","POST"])
 @login_required
 def forum_search():
     #if get send to search form

@@ -33,7 +33,7 @@ class User(db.Model):
 
     @staticmethod
     def get_user_info(user_id):
-        stmt = text("SELECT account.id, account.username, account.date_posted,"
+        stmt = text("SELECT account.id, account.username, account.admin, account.date_posted,"
                     " COUNT(DISTINCT thread.id) AS threadcount,"
                     " COUNT(DISTINCT message.id) AS postcount FROM account"
                     " LEFT JOIN thread ON thread.user_id = account.id"
@@ -42,3 +42,15 @@ class User(db.Model):
         user_info = db.engine.execute(stmt).fetchone()    
 
         return user_info
+
+    @staticmethod
+    def get_all_user_info(user_id):
+        stmt = text("SELECT account.id, account.username, account.admin, account.date_posted,"
+                    " COUNT(DISTINCT thread.id) AS threadcount,"
+                    " COUNT(DISTINCT message.id) AS postcount FROM account"
+                    " LEFT JOIN thread ON thread.user_id = account.id"
+                    " LEFT JOIN message ON message.user_id = account.id"
+                    " WHERE account.id != :user_id AND account.id != 0 GROUP BY account.id").params(user_id = user_id)
+        users_info = db.engine.execute(stmt)    
+
+        return users_info        

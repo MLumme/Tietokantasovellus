@@ -28,7 +28,7 @@
 
                     {% if current_user.is_authenticated and current_user.is_admin() %}
                         <li>
-                            <a class="nav-link" href="{{url_for('thread_index')}}">Admin Tools</a>                            
+                            <a class="nav-link" href="{{url_for('forum_admin')}}">Admin Tools</a>                            
                         </li>                    
                     {% endif %}   
                     

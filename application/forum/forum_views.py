@@ -20,16 +20,17 @@ def thread_new():
         thread_form = ThreadForm()
 
         subjects = [(subject.id, subject.name) for subject in Subject.query.all()]
-        thread_form.subjects.choices = subjects
-
+        thread_form.subjects.choices += subjects
+        
         return render_template("forum/newthread.html", thread_form = thread_form)    
 
     #else extract form, add new entries for thread and message tables
+    subjects = [(subject.id, subject.name) for subject in Subject.query.all()]
     thread_form = ThreadForm(request.form)
+    thread_form.subjects.choices += subjects
 
-    if(not thread_form.validate()):
+    if(not thread_form.validate_on_submit()):
         err = thread_form.errors
-        print(err)
         return render_template("forum/newthread.html", thread_form = thread_form, err=err)
 
 
