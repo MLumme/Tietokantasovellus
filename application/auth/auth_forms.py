@@ -86,6 +86,17 @@ class UsrChangeForm(FlaskForm):
             self.new_username.errors.append(err)
             error = True
 
+        #if one of the above won't validate don't bother querying the database
+        if(not error):
+
+            user = User.query.filter_by(username = self.new_username.data).first()
+
+        #test if preexisting user has same username
+        if(user):
+            err = "Username already taken"
+            self.new_username.errors.append(err)
+            error = True    
+
         if(error):
             return False
 

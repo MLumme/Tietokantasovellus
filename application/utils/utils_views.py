@@ -47,7 +47,7 @@ def user_page(user_id):
     password_change_form = PswChangeForm()
     username_change_form = UsrChangeForm()
 
-    return render_template("utils/userpage.html",user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form)
+    return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form)
 
 @app.route("/forum/user/<user_id>/changepsw",methods = ["POST"])
 @login_required
@@ -58,12 +58,13 @@ def user_password(user_id):
         return render_template("forum/showthreads.html",err=err)
 
     password_change_form = PswChangeForm(request.form)
+    username_change_form = UsrChangeForm()
 
     #validate that field imputs correct
     if(not password_change_form.validate()):
         user_info = User.get_user_info(user_id)
         err = password_change_form.errors
-        return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, err = err)
+        return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form, err = err)
 
     #check if old password is correct
     user = User.query.filter_by(id = user_id, password = password_change_form.old_password.data).first()
@@ -71,7 +72,7 @@ def user_password(user_id):
     if(not user):                
         user_info = User.get_user_info(user_id)
         err = {'Error':['Old password incorrect']}
-        return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, err = err)
+        return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form, err = err)
 
     #replace password, commit to database
     user.password = password_change_form.new_password.data
@@ -92,12 +93,13 @@ def user_username(user_id):
         return render_template("forum/showthreads.html",err=err)
 
     username_change_form = UsrChangeForm(request.form)
+    password_change_form = PswChangeForm()
 
     #validate that field imputs correct, also tests if new username is already taken
     if(not username_change_form.validate()):
         user_info = User.get_user_info(user_id)
         err = username_change_form.errors            
-        return render_template("utils/userpage.html", user_info = user_info, username_change_form = username_change_form, err = err)
+        return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form, err = err)
 
     #replace username, commit to database
     user = User.query.filter_by(id = user_id).first()

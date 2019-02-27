@@ -55,6 +55,7 @@
             <button class="btn btn-lg btn-danger" type="submit">DELETE</button>
         </form>    
     </div>
+    
     <div class="tab-pane fade" id="changeusr" role="tabpanel" aria-labelledby="changeusr-tab">
         <div class="auth-form">
             <form method="POST" action="{{url_for('user_username', user_id = user_info.id)}}">
@@ -67,6 +68,7 @@
             </form>
         </div>
     </div>
+
     <div class="tab-pane fade" id="changepsw" role="tabpanel" aria-labelledby="changepsw-tab">
         <div class="auth-form">
             <form method="POST" action="{{url_for('user_password', user_id = user_info.id)}}">
