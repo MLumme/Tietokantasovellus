@@ -7,7 +7,7 @@ from application.auth.auth_models import User
 #class for username and pasword needed for login
 class LoginForm(FlaskForm):
     username = StringField("Username:", [validators.Required("Username missing"), validators.Length(min=4, max=200, message="Username must be between 4 and 200 characters long")]) 
-    password = PasswordField("Password:", [validators.Required("Password missing"), validators.Length(min=4, max=200, message="Password must be between 10 and 200 characters long")])
+    password = PasswordField("Password:", [validators.Required("Password missing"), validators.Length(min=10, max=200, message="Password must be between 10 and 200 characters long")])
    
     class Meta:
         csrf = False

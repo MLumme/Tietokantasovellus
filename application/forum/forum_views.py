@@ -33,7 +33,6 @@ def thread_new():
         err = thread_form.errors
         return render_template("forum/newthread.html", thread_form = thread_form, err=err)
 
-
     subjects = Subject.query.filter(Subject.id.in_(thread_form.subjects.data)).all()
 
     thread = Thread(thread_form.title.data,current_user.get_id(),subjects)
@@ -53,8 +52,8 @@ def thread_new():
 def thread_view(thread_id):
     #thread deletion
     if(request.method == "POST" and current_user.is_admin()):
-        thread = db.session().query(Thread).filter_by(id = thread_id).first()
-        
+        thread = Thread.query.get(thread_id)
+
         db.session().delete(thread)
         db.session().commit()
 
@@ -92,7 +91,7 @@ def thread_add(thread_id):
 
     message = Message(message_form.message.data, current_user.get_id())
     
-    thread = Thread.query.filter_by(id=thread_id).one()
+    thread = Thread.query.get(thread_id)
     thread.messages.append(message)
 
     db.session.merge(thread)
@@ -106,7 +105,7 @@ def thread_add(thread_id):
 @app.route("/forum/message/<message_id>", methods = ["GET","POST"])
 @login_required
 def msg_edit(message_id):
-    message = Message.query.filter_by(id=message_id).one()
+    message = Message.query.get(message_id)
 
     #if GET render message edit form
     if(request.method == "GET"):
@@ -125,7 +124,7 @@ def msg_edit(message_id):
     message.content = message_form.message.data
 
     thread_id = message.thread_id
-
+    
     db.session.commit()
 
     return redirect(url_for("thread_view", thread_id = thread_id))
@@ -142,5 +141,13 @@ def msg_remove(message_id):
 
         db.session.delete(message)
         db.session.commit()
+
+        if(len(Thread.query.get(thread_id).messages) == 0):
+            thread = Thread.query.get(thread_id)
+
+            db.session().delete(thread)
+            db.session().commit()
+
+        return redirect(url_for("thread_index"))
 
     return redirect(url_for("thread_view", thread_id = thread_id))

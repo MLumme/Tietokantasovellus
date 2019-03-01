@@ -31,6 +31,7 @@ class User(db.Model):
     def is_admin(self):
         return self.admin
 
+    #find information on account and thread and postcounts for single user
     @staticmethod
     def get_user_info(user_id):
         stmt = text("SELECT account.id, account.username, account.admin, account.date_posted,"
@@ -43,6 +44,7 @@ class User(db.Model):
 
         return user_info
 
+    #find above information on useres other than the one with user_id
     @staticmethod
     def get_all_user_info(user_id):
         stmt = text("SELECT account.id, account.username, account.admin, account.date_posted,"

@@ -64,7 +64,7 @@
                 {% for user in users %}
                     <tr>
                         <td>
-                            {{user.username}}
+                            <a href="{{url_for('user_page', user_id = user.id)}}">{{user.username}}</a>
                         </td>
                         <td>
                             {{user.date_posted}}

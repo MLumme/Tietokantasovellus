@@ -2,9 +2,8 @@ from flask import Flask
 
 app = Flask(__name__)
 
-from application import forum_views
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_bcrypt import Bcrypt
 import os
 
 if(os.environ.get("HEROKU")):
@@ -14,6 +13,7 @@ else:
     app.config["SQLALCHEMY_ECHO"] = True
 
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 
 from application.forum import forum_models, forum_views
 from application.auth import auth_models, auth_views

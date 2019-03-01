@@ -1,4 +1,4 @@
-from application import app, db
+from application import app, db, bcrypt
 from application.forum.forum_models import Thread, Message, Subject
 from application.forum.forum_forms import ThreadForm, MessageForm, ThreadForm
 from application.utils.utils_forms import SearchForm, SubjectForm
@@ -7,6 +7,7 @@ from application.auth.auth_forms import PswChangeForm, UsrChangeForm
 from flask import request, render_template, url_for, redirect
 from flask_login import login_required, current_user
 from sqlalchemy.sql import text
+from application.scripts.scripts import test_if_admin_or_self
 
 #functionality for user to view their information and delete themselves, or for 
 # admin to do the same to other users 
@@ -14,9 +15,7 @@ from sqlalchemy.sql import text
 @login_required
 def user_page(user_id):
     #allow rights to view or delete profile only to users themselves or admins
-    if(not(current_user.is_admin()) and (str(current_user.id) != user_id)):
-        err = {"privilegeerror": ["Insufficient user privileges to use this function"]}
-        return render_template("forum/showthreads.html",err=err) 
+    test_if_admin_or_self(user_id)
      
     #delete user 
     if(request.method == "POST"):
@@ -54,9 +53,7 @@ def user_page(user_id):
 @login_required
 def user_password(user_id):
     #check that user is attempting to change their own password, or is admin
-    if(not(current_user.is_admin()) and (str(current_user.id) != user_id)):
-        err = {"privilegeerror": ["Insufficient user privileges to use this function"]}
-        return render_template("forum/showthreads.html",err=err)
+    test_if_admin_or_self(user_id)
 
     password_change_form = PswChangeForm(request.form)
     username_change_form = UsrChangeForm()
@@ -68,15 +65,15 @@ def user_password(user_id):
         return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form, err = err)
 
     #check if old password is correct
-    user = User.query.filter_by(id = user_id, password = password_change_form.old_password.data).first()
+    user = User.query.get(user_id)
 
-    if(not user):                
+    if(not bcrypt.check_password_hash(user.password, password_change_form.old_password.data)):                
         user_info = User.get_user_info(user_id)
         err = {'Error':['Old password incorrect']}
         return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form, err = err)
 
     #replace password, commit to database
-    user.password = password_change_form.new_password.data
+    user.password = bcrypt.generate_password_hash(password_change_form.new_password.data)
     db.session.commit()
 
     #if user changed own password logout
@@ -90,9 +87,7 @@ def user_password(user_id):
 @login_required
 def user_username(user_id):
     #check that user is attempting to change their own username, or is admin
-    if(not(current_user.is_admin()) and (str(current_user.id) != user_id)):
-        err = {"privilegeerror": ["Insufficient user privileges to use this function"]}
-        return render_template("forum/showthreads.html",err=err)
+    test_if_admin_or_self(user_id)
 
     username_change_form = UsrChangeForm(request.form)
     password_change_form = PswChangeForm()
@@ -104,7 +99,7 @@ def user_username(user_id):
         return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form, err = err)
 
     #replace username, commit to database
-    user = User.query.filter_by(id = user_id).first()
+    user = User.query.get(user_id)
     user.username = username_change_form.new_username.data
 
     db.session.commit()
@@ -139,18 +134,20 @@ def forum_admin():
 @app.route("/util/user/<user_id>/admin",methods = ["POST"])
 @login_required
 def user_admin(user_id):
+    #check if user is admin
     if(not current_user.is_admin()):
-        return redirect(url_for("thread_index"))
+        return render_template("error/incorrectrole.html")
 
     user = User.query.get(user_id)
 
+    #chec if user to be promoted is already an admin 
     if(user.is_admin()):
-        return redirect(url_for("thread_index"))
+        err = {"error": ["user already admin"]}
+        return redirect(url_for("forum_admin",err = err))
 
     user.admin = True
     db.session.commit()
     
-    print(user)
     return redirect(url_for("forum_admin"))
 
 #form for search functionality
@@ -163,7 +160,6 @@ def forum_search():
 
         subjects = [(-1,"none")]
         subjects.extend([(subject.id, subject.name) for subject in Subject.query.all()])
-        print(subjects)
         search_form.search_subjects.choices = subjects
 
         return render_template("utils/search.html", search_form = search_form)    

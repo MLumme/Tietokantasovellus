@@ -1,4 +1,4 @@
-from application import app,db
+from application import app, db, bcrypt
 from application.auth.auth_models import User
 from flask_script import Manager
 import sys
@@ -12,12 +12,12 @@ def create_admin():
     if(User.query.all()):
         return
 
-    admin = User("Admin","Password1234")
+    admin = User("Admin", bcrypt.generate_password_hash("Password1234"))
     admin.admin = True
     
     db.session.add(admin)
 
-    deleteduser = User("deleted user","Password1234")
+    deleteduser = User("deleted user", bcrypt.generate_password_hash("Password1234"))
     deleteduser.id = 0
 
     db.session.add(deleteduser)
