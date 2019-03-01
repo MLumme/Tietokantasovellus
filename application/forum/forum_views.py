@@ -63,7 +63,7 @@ def thread_view(thread_id):
     thread_contents = db.session().query(Thread.id,Thread.title,Message,User.username,User.id).\
         filter(Thread.id == thread_id).\
         join(Message, Message.thread_id == Thread.id).\
-        join(User, User.id == Message.user_id).all()
+        join(User, User.id == Message.user_id).order_by(Message.date_posted).all()
 
     message_form = MessageForm()
 
