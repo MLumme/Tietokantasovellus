@@ -1,17 +1,14 @@
 from application import db
 from sqlalchemy import event
-#from application.auth.auth_models import User
+from application.db_base import base_model
 
 association_table = db.Table("threadsubject", db.Model.metadata,
     db.Column("thread_id",db.Integer, db.ForeignKey('thread.id')),      
     db.Column("subject_id",db.Integer, db.ForeignKey('subject.id'))
 )
 
-class Thread(db.Model):
+class Thread(base_model.Base):
     __tablename__ = "thread"
-    id = db.Column(db.Integer, primary_key = True)
-    date_posted = db.Column(db.DateTime, default = db.func.current_timestamp())
-    date_edited = db.Column(db.DateTime, default = db.func.current_timestamp())
     title = db.Column(db.String(200), nullable = False)
     messages = db.relationship("Message", cascade="all, delete-orphan")
     user_id = db.Column(db.Integer, db.ForeignKey('account.id'))
@@ -22,11 +19,8 @@ class Thread(db.Model):
         self.user_id = user_id
         self.subjects = subjects 
 
-class Message(db.Model):
+class Message(base_model.Base):
     __tablename__ = "message"
-    id = db.Column(db.Integer, primary_key = True)
-    date_posted = db.Column(db.DateTime, default = db.func.current_timestamp())
-    date_edited = db.Column(db.DateTime, default = db.func.current_timestamp(), onupdate = db.func.current_timestamp())
     content = db.Column(db.String(1000), nullable = False)
     thread_id = db.Column(db.Integer,db.ForeignKey('thread.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('account.id'))

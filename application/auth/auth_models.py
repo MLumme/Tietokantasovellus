@@ -1,11 +1,9 @@
 from application import db
 from sqlalchemy.sql import text
+from application.db_base import base_model 
 
-class User(db.Model):
+class User(base_model.Base):
     __tablename__ = "account"
-    id = db.Column(db.Integer, primary_key=True)
-    date_posted = db.Column(db.DateTime, default = db.func.current_timestamp())
-    date_edited = db.Column(db.DateTime, default = db.func.current_timestamp(), onupdate = db.func.current_timestamp())
     username = db.Column(db.String(200), nullable = False)
     password = db.Column(db.String(200), nullable = False)
     admin = db.Column(db.Boolean, default = False)

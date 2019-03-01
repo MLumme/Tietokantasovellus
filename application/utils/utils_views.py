@@ -58,9 +58,10 @@ def user_password(user_id):
     password_change_form = PswChangeForm(request.form)
     username_change_form = UsrChangeForm()
 
+    user_info = User.get_user_info(user_id)
+
     #validate that field imputs correct
     if(not password_change_form.validate()):
-        user_info = User.get_user_info(user_id)
         err = password_change_form.errors
         return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form, err = err)
 
@@ -68,7 +69,6 @@ def user_password(user_id):
     user = User.query.get(user_id)
 
     if(not bcrypt.check_password_hash(user.password, password_change_form.old_password.data)):                
-        user_info = User.get_user_info(user_id)
         err = {'Error':['Old password incorrect']}
         return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form, err = err)
 
@@ -80,7 +80,7 @@ def user_password(user_id):
     if(str(current_user.id) == user_id):
         return redirect(url_for('auth_logout'))
 
-    return redirect(url_for("thread_index")) 
+    return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form)
 
 #change username
 @app.route("/util/user/<user_id>/changeusr",methods = ["POST"])
@@ -104,7 +104,9 @@ def user_username(user_id):
 
     db.session.commit()
 
-    return redirect(url_for("thread_index"))
+    user_info = User.get_user_info(user_id)
+
+    return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form)
 
 #functionality for admins to view and manipulate users and add subjects to use in threads
 @app.route("/util/admin", methods = ["GET","POST"])

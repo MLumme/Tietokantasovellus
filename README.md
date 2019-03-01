@@ -1,6 +1,10 @@
-Repo for database project for course TKT20011, project subject web forum. Eventually will provide functionality for registration/login, posting of new threads and responses and removal of them, designation of thread subjects, and finally search functionality.
+Forum-project for TKT20011. Project provides for user a possibilty to register and log in on the forum view threads and their messages, add new threads and messages, and edit messages by themselves, and search for threads and messages. Additionally they can view their information such as number of posts made, change their password and usernames. In addition, there is a admin level user/s which can in addition of common user fuctionalities remove threads and messages, edit messages made by anyone, and view all users, remove them, promoten new admins, and add new subjects that can be used in thread creation and search.
 
-**Default Admin-accounts username is Admin, password is Password1234 (Yes, incredibly safe, and stored as plantext to be even more safe)**
+Some notes on CRUD, both user and message tables have full implementation, but functions for user ar split btween auth_views and util_views.
+
+Additional note on security, there are several if-statements and scripts in place that in normal use should newer activate if forum is used normally, as the buttons are not there if someone does not have admin-rights, but will (probaly) trigger if someone is sending post-requests using for example VS Codes Rest-client without admin-login, although I haven't tested it.
+
+**Default Admin-accounts username is Admin, password is Password1234 (Yes, incredibly safe)**
 
 [Location of the Heroku-app](https://arcane-temple-53433.herokuapp.com/forum/)
 
@@ -10,13 +14,5 @@ Repo for database project for course TKT20011, project subject web forum. Eventu
 
 Installation locally:
   * Virtual or not, install requirements from requirements.txt with `pip install -r requirements.txt` in root of the project.
-  * Next, run `python3 manage.py create_admin`, which first create needed database-tables, locally will be in `application/forum.db`. Afterwards, and even in case of prexisting tables, inserts an Admin account, details of which has been given above, but only if account-table is empty. on Heroku will be automatically run during deployment.
+  * Next, run `python3 manage.py create_admin`, which first create needed database-tables, locally will be in `application/forum.db`. Afterwards, and even in case of prexisting tables, inserts an Admin account and an deleted user account, details of admin-account  are provided above, but only if account-table is empty. on Heroku will be automatically run during deployment.
   * Run `python3 run.py`, go to `http://127.0.0.1:[PORT]/forum/`, replacing [PORT] with whatever your python has used, probably 5000.
-
-ToDo: 
-  * Finish adding last valdations in place concerning messages.
-  * Add checks in paths to check that functionalities meant for admins cannot be used by normal users even if they circumvent the lack of buttons and links to them in page views.
-  * Encrypt passwords finally.
-  * Implement user- and admin-utilities, eg. userprofiles, view of all users for admins for promoting other users to admins or deleting them.
-  * Linked to above , in case of user deletion insert into database a deleted user entry where to link posts by deleted users, so that messages won't get orphaned from user relations.  
-  * Finnish wotking on transfering everything to use Bootstrap-styles where usable.

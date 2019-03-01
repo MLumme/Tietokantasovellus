@@ -148,6 +148,6 @@ def msg_remove(message_id):
             db.session().delete(thread)
             db.session().commit()
 
-        return redirect(url_for("thread_index"))
+            return redirect(url_for("thread_index"))
 
     return redirect(url_for("thread_view", thread_id = thread_id))
