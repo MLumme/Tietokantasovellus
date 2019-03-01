@@ -12,12 +12,12 @@ def create_admin():
     if(User.query.all()):
         return
 
-    admin = User("Admin", bcrypt.generate_password_hash("Password1234"))
+    admin = User("Admin", bcrypt.generate_password_hash("Password1234").decode('utf-8'))
     admin.admin = True
     
     db.session.add(admin)
 
-    deleteduser = User("deleted user", bcrypt.generate_password_hash("Password1234"))
+    deleteduser = User("deleted user", bcrypt.generate_password_hash("Password1234").decode('utf-8'))
     deleteduser.id = 0
 
     db.session.add(deleteduser)

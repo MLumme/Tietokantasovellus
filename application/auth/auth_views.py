@@ -65,7 +65,7 @@ def auth_reg():
         return render_template("auth/register.html", reg_form = reg_form, err = err)
 
     #create user and commit to db
-    user = User(reg_form.username.data, bcrypt.generate_password_hash(reg_form.password.data))
+    user = User(reg_form.username.data, bcrypt.generate_password_hash(reg_form.password.data).decode('utf-8'))
 
     db.session.add(user)
     db.session.commit()

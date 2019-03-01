@@ -73,7 +73,7 @@ def user_password(user_id):
         return render_template("utils/userpage.html", user_info = user_info, password_change_form = password_change_form, username_change_form = username_change_form, err = err)
 
     #replace password, commit to database
-    user.password = bcrypt.generate_password_hash(password_change_form.new_password.data)
+    user.password = bcrypt.generate_password_hash(password_change_form.new_password.data).decode('utf-8')
     db.session.commit()
 
     #if user changed own password logout
