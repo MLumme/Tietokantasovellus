@@ -1,6 +1,6 @@
 Forum-project for TKT20011. Project provides for user a possibilty to register and log in on the forum view threads and their messages, add new threads and messages, and edit messages by themselves, and search for threads and messages. Additionally they can view their information such as number of posts made, change their password and usernames. In addition, there is a admin level user/s which can in addition of common user fuctionalities remove threads and messages, edit messages made by anyone, and view all users, remove them, promoten new admins, and add new subjects that can be used in thread creation and search.
 
-Some notes on CRUD, both user and message tables have full implementation, but functions for user ar split btween auth_views and util_views.
+Some notes on CRUD, both user and message tables have full implementation, but functions for user are split between auth_views and util_views.
 
 Additional note on security, there are several if-statements and scripts in place that in normal use should newer activate if forum is used normally, as the buttons are not there if someone does not have admin-rights, but will (probaly) trigger if someone is sending post-requests using for example VS Codes Rest-client without admin-login, although I haven't tested it.
 
